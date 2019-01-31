@@ -1,4 +1,4 @@
-package control;
+package reste;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
@@ -17,23 +17,29 @@ import model.Sounding;
 import model.Station;
 
 public class Weather_Data_Parser 
-{
-	private String stationShort,stationName;
+{		
+	Sounding data;
 			
-	public Sounding generateSounding(String toParse, String region)
+	public Sounding getData()
 	{
-		//Erzeugt Sounding OHNE überprüfung ob Daten korrekt - Kann beliebig knallen
-		
+		return data;
+	}
+	
+	public void validate(String toParse, String region)
+	{		
 		StringReader reader = new StringReader(toParse);
-		BufferedReader buf = new BufferedReader(reader);
-		
-		//System.out.println("Zu Bearbeiten\n" + toParse);
+		BufferedReader buf = new BufferedReader(reader);		
 			
 		List<String> tokens = buf.lines().collect(Collectors.toList());
 		
-		//System.out.println("\nAb hier Tokens: " + tokens.size()+" \n");
-		//tokens.forEach(arg -> System.out.println(arg));
-		
+		if(tokens.stream().anyMatch(element -> element.contains("No observations found for selection conditions")))
+		{
+			System.out.println("Fehler bei Dateneinlesen");
+			//Fehlerbehandlung
+			data = null;
+			return;
+		}
+				
 		List<String> zeile2,zeile5;
 		
 		zeile2 = Arrays.asList(tokens.get(2).split("[ ]+"));
@@ -67,8 +73,8 @@ public class Weather_Data_Parser
 		
 		System.out.println("Datum "+ldt+"\n");
 				
-		stationName = zeile5.get(3);	
-		stationShort = zeile5.get(2);
+		String stationName = zeile5.get(3);	
+		String stationShort = zeile5.get(2);
 		String countryID = zeile5.get(4);
 		
 		int elevation = Integer.parseInt(zeile2.get(9));
@@ -105,7 +111,6 @@ public class Weather_Data_Parser
 			if(third.equals("W"))
 				longitude = -longitude;
 		}		
-		
 				
 		Station station = new Station(stationName, stationShort, countryID, region,longitude ,latitude ,stationID ,elevation);
 		
@@ -114,21 +119,28 @@ public class Weather_Data_Parser
 		int beginOfTable = 12;
 		int skip = 1;
 		int size = levels;
-		int limit = size / skip + Math.min(size % skip, 1);	
+		int limit = size / skip + Math.min(size % skip, 1);					
 		
-		// a ? b : c = if a return b else return c
+		if(tokens.size()<limit)
+		{
+			System.out.println("Zu wenig Level im Datensatz");
+			data = null;
+			return;
+		}
+		else {
+			List<String> levelDataString = Stream.iterate(beginOfTable, i -> i+skip)
+					.limit(limit)
+					.map(tokens::get)
+					.map(arg -> arg.trim())
+					.map(arg -> arg.contains("---") ? arg.replace("-----", "0") : arg)
+					.filter(arg -> arg.length() != 0)
+					.collect(Collectors.toList());			
+			
+			List<LevelData> levelDatas = levelDataString.stream().map(arg -> new LevelData(arg.split("\\s+"))).collect(Collectors.toList());		
+			
+			//data = new Sounding(station, ldt, levelDatas);
+		}
 		
-	
-		List<String> levelDataString = Stream.iterate(beginOfTable, i -> i+skip)
-				.limit(limit)
-				.map(tokens::get)
-				.map(arg -> arg.trim())
-				.map(arg -> arg.contains("---") ? arg.replace("-----", "0") : arg)
-				.filter(arg -> arg.length() != 0)
-				.collect(Collectors.toList());			
-		
-		List<LevelData> levelDatas = levelDataString.stream().map(arg -> new LevelData(arg.split("\\s+"))).collect(Collectors.toList());		
-		
-		return new Sounding(station, ldt, levelDatas);			
+					
 	}
 }
