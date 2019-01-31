@@ -4,14 +4,15 @@ package model;
 public class Station {
 
 	
-	private String stationName, stationShort, country;
+	private String stationName, stationShort, country, region;
 	
 	private double longitude,latitude;	
 	
-	public Station(String stationName, String stationShort, String country, double longitude, double latitude,
+	public Station(String stationName, String stationShort, String country, String region, double longitude, double latitude,
 			int stationID, int elevation)
 	{
 		this.country = country;
+		this.region = region;
 		this.stationName = stationName;
 		this.stationShort = stationShort;
 		this.elevation = elevation;
@@ -119,6 +120,20 @@ public class Station {
 	}
 
 	private int stationID, elevation;
+
+	/**
+	 * @return the region
+	 */
+	public String getRegion() {
+		return region;
+	}
+
+	/**
+	 * @param region the region to set
+	 */
+	public void setRegion(String region) {
+		this.region = region;
+	}
 	
 	
 }

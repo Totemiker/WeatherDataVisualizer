@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -17,9 +19,11 @@ import model.Station;
 public class Weather_Data_Parser 
 {
 	private String stationShort,stationName;
-	
-	public Sounding generateSounding(String toParse)
+			
+	public Sounding generateSounding(String toParse, String region)
 	{
+		//Erzeugt Sounding OHNE überprüfung ob Daten korrekt - Kann beliebig knallen
+		
 		StringReader reader = new StringReader(toParse);
 		BufferedReader buf = new BufferedReader(reader);
 		
@@ -27,7 +31,7 @@ public class Weather_Data_Parser
 			
 		List<String> tokens = buf.lines().collect(Collectors.toList());
 		
-		System.out.println("\nAb hier Tokens: " + tokens.size()+" \n");
+		//System.out.println("\nAb hier Tokens: " + tokens.size()+" \n");
 		//tokens.forEach(arg -> System.out.println(arg));
 		
 		List<String> zeile2,zeile5;
@@ -35,8 +39,8 @@ public class Weather_Data_Parser
 		zeile2 = Arrays.asList(tokens.get(2).split("[ ]+"));
 		zeile5 = Arrays.asList(tokens.get(5).split("[ ]+"));
 		
-		System.out.println("Zeile 2 " + zeile2);
-		System.out.println("Zeile 5 " + zeile5);
+		//System.out.println("Zeile 2 " + zeile2);
+		//System.out.println("Zeile 5 " + zeile5);
 		
 		int stationID = Integer.parseInt(zeile5.get(1));
 		
@@ -61,38 +65,56 @@ public class Weather_Data_Parser
 		
 		LocalDateTime ldt = LocalDateTime.of(ld, time);
 		
-		System.out.println("Datum "+p1+" "+p2+" "+ldt+"\n");
+		System.out.println("Datum "+ldt+"\n");
 				
 		stationName = zeile5.get(3);	
 		stationShort = zeile5.get(2);
 		String countryID = zeile5.get(4);
 		
-		
-		//int stationID = Integer.parseInt(zeile2.get(4));
 		int elevation = Integer.parseInt(zeile2.get(9));
 		
 		String latstr = zeile5.get(5);
-		String[] temp = latstr.split(":");
-		System.out.println("Lat "+temp[0] +" / "+ temp[1]);
+		String lonStr = zeile5.get(6);
 		
-		//Decimal Degrees = Degrees + minutes/60
+		Pattern latPat = Pattern.compile("([0-9]+):([0-9]+)(N|S)");
+		Matcher latMat = latPat.matcher(latstr);
+		double latitude = 0;
+		if(latMat.matches())
+		{			
+			String first = latMat.group(1);
+			String second = latMat.group(2);
+			String third = latMat.group(3);
+			//System.out.println("1st "+first + " 2nd "+second+ " 3rd "+ third);
+			
+			latitude = Double.parseDouble(first) + (Double.parseDouble(second)/60D);
+			if(third.equals("S"))
+				latitude = -latitude;
+		}	
 		
-		String lonstr = zeile5.get(6);
-		String[] temp2 = lonstr.split(":");		
+		Pattern lonPat = Pattern.compile("([0-9]+):([0-9]+)(E|W)");
+		Matcher lonMat = lonPat.matcher(lonStr);
+		double longitude = 0;
+		if(lonMat.matches())
+		{			
+			String first = lonMat.group(1);
+			String second = lonMat.group(2);
+			String third = lonMat.group(3);
+			//System.out.println("1st "+first + " 2nd "+second+ " 3rd "+ third);
+			
+			longitude = Double.parseDouble(first) + (Double.parseDouble(second)/60D);
+			if(third.equals("W"))
+				longitude = -longitude;
+		}		
 		
-		double latitude = Double.parseDouble(temp[0]) + (Double.parseDouble(temp[1].substring(0, 2))/60D);
-		double longitude = Double.parseDouble(temp2[0]) + (Double.parseDouble(temp2[1].substring(0,2))/60D);
 				
-		Station station = new Station(stationName, stationShort, countryID,longitude ,latitude ,stationID ,elevation);
+		Station station = new Station(stationName, stationShort, countryID, region,longitude ,latitude ,stationID ,elevation);
 		
 		int levels = Integer.parseInt(zeile2.get(9));
 		
 		int beginOfTable = 12;
 		int skip = 1;
 		int size = levels;
-		int limit = size / skip + Math.min(size % skip, 1);
-		
-	
+		int limit = size / skip + Math.min(size % skip, 1);	
 		
 		// a ? b : c = if a return b else return c
 		
@@ -107,7 +129,6 @@ public class Weather_Data_Parser
 		
 		List<LevelData> levelDatas = levelDataString.stream().map(arg -> new LevelData(arg.split("\\s+"))).collect(Collectors.toList());		
 		
-		return new Sounding(station, ldt, levelDatas);	
-		
+		return new Sounding(station, ldt, levelDatas);			
 	}
 }

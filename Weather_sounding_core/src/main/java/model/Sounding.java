@@ -50,5 +50,5 @@ public class Sounding
 
 	public void setLeveldata(List<LevelData> leveldata) {
 		this.leveldata = leveldata;
-	}	
+	}
 }
