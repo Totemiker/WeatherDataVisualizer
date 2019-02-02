@@ -11,7 +11,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import control.Data_Provider;
-import reste.Weather_Data_Parser;
+import model.WeatherDataParser;
 
 public class Test 
 {
@@ -21,7 +21,7 @@ public class Test
 	public static void main(String[] args)
 	{
 		Data_Provider conn = new Data_Provider();
-		Weather_Data_Parser parser = new Weather_Data_Parser();
+		WeatherDataParser parser = new WeatherDataParser();
 		
 	
 		//parser.validate(conn.getDataFromStationInText(10410, LocalDateTime.of(LocalDate.of(2019,01,24), LocalTime.of(00, 00))),"EUR");

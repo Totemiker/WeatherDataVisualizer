@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
@@ -10,6 +11,7 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
@@ -20,7 +22,7 @@
    <center>
       <TabPane prefHeight="400.0" prefWidth="400.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
         <tabs>
-          <Tab text="Data Import">
+          <Tab text="Data Selection">
                <content>
                   <SplitPane dividerPositions="0.3" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
                     <items>
@@ -34,7 +36,7 @@
                                              <font>
                                                 <Font size="14.0" />
                                              </font></Label>
-                                          <ComboBox fx:id="region_Chooser" prefWidth="150.0" promptText="Choose Region" />
+                                          <ComboBox fx:id="regionChooser" onAction="#chooseRegionAction" prefWidth="150.0" promptText="Choose Region" />
                                        </children>
                                        <padding>
                                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -50,7 +52,7 @@
                                                 <Font size="14.0" />
                                              </font>
                                           </Label>
-                                          <ComboBox fx:id="station_Chooser" prefWidth="150.0" promptText="Choose Station" />
+                                          <ComboBox fx:id="stationChooser" onAction="#stationChooserAction" prefWidth="150.0" promptText="Choose Station" />
                                        </children>
                                        <padding>
                                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -62,7 +64,12 @@
                                              <font>
                                                 <Font size="14.0" />
                                              </font></Label>
-                                          <DatePicker />
+                                          <DatePicker fx:id="datePickerStart" />
+                                          <ChoiceBox fx:id="startTimeChoiceBox" prefWidth="100.0">
+                                             <tooltip>
+                                                <Tooltip text="Uhrzeit des Soundings auswählen" />
+                                             </tooltip>
+                                          </ChoiceBox>
                                        </children>
                                        <padding>
                                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -74,8 +81,13 @@
                                              <font>
                                                 <Font size="14.0" />
                                              </font></Label>
-                                          <DatePicker />
-                                          <Button mnemonicParsing="false" text="Import" />
+                                          <DatePicker fx:id="datePickerEnde" />
+                                          <ChoiceBox fx:id="endTimeChoiceBox" prefWidth="100.0">
+                                             <tooltip>
+                                                <Tooltip text="Uhrzeit des Soundings auswählen" />
+                                             </tooltip>
+                                          </ChoiceBox>
+                                          <Button fx:id="selectButton" mnemonicParsing="false" onAction="#selectButtonAction" text="Select" />
                                        </children>
                                        <padding>
                                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -101,11 +113,6 @@
                     </items>
                   </SplitPane>
                </content>
-          </Tab>
-          <Tab text="Data Selection">
-            <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-            </content>
           </Tab>
             <Tab text="Data Presentation">
               <content>

@@ -2,17 +2,21 @@ package model;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
+/**
+ * Klasse zum Speichern eines Soundings
+ * @author Tobias
+ *
+ */
 public class Sounding 
 {	
 	private List<LevelData> leveldata;	
 	private LocalDateTime dateAndTime;	
 	private double longitude,latitude;	
-	private int elevation;
+	private int elevation, stationID, levels;
 	private String stationCode, country;
 		
 	public Sounding(LocalDateTime dateAndTime, List<LevelData> leveldata, double longitude, double lat, int elevation,
-			String stationCode, String country)
+			int stationID, String stationCode, String country)
 	{		
 		this.setDateAndTime(dateAndTime);
 		this.setLeveldata(leveldata);
@@ -21,6 +25,11 @@ public class Sounding
 		this.elevation = elevation;
 		this.stationCode = stationCode;
 		this.country = country;
+		this.setStationID(stationID);
+	}
+
+	public Sounding() {
+		
 	}
 
 	/**
@@ -113,5 +122,27 @@ public class Sounding
 	 */
 	public void setCountry(String country) {
 		this.country = country;
+	}
+
+	public int getStationID() {
+		return stationID;
+	}
+
+	public void setStationID(int stationID) {
+		this.stationID = stationID;
+	}
+	
+	public int getLevels() {
+		return levels;
+	}
+
+	public void setLevels(int levels) {
+		this.levels = levels;
+	}
+
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return super.toString();
 	}
 }

@@ -44,7 +44,8 @@ public class Main_GUI extends Application {
 			//Setting of props into mainguicontroller
 			
 			((Main_GUI_Controller)loader.getController()).setProperties(properties);
-			((Main_GUI_Controller)loader.getController()).setDataProvider(new Data_Provider());
+			((Main_GUI_Controller)loader.getController()).setDataProvider(new Data_Provider(properties));
+			((Main_GUI_Controller)loader.getController()).setData();
 			
 			primaryStage.setScene(scene);
 			primaryStage.setTitle("Weather Data Analyzer");
@@ -76,11 +77,15 @@ public class Main_GUI extends Application {
 	    
 	    // Save file
 	}
-	
+	/**
+	 * Lädt die Properties von der Festplatte
+	 * Wenn keine vorhanden sind werden Default werte erzeugt
+	 */
 	private void loadProperties()
 	{
 		// set defaults
 		properties.setProperty("data_dir", (System.getProperty("user.dir")+"\\data"));
+		properties.setProperty("weblink", "http://meteocentre.com/radiosonde/get_sounding.php?");
 		
 		// override values by loading from file
 		try {

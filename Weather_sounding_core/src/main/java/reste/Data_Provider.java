@@ -67,27 +67,7 @@ public class Data_Provider
 	/**
 	 * 
 	 */
-	public String getDataFromStationInText(int stationID,LocalDateTime time, String area)
-	{		
-		String urlBuilder ="http://meteocentre.com/radiosonde/get_sounding.php?lang=en&show=0&hist=0&area="
-							+area+"&stn="
-							+stationID+"&type=txt&yyyy="
-							+time.getYear()+"&mm="
-							+time.getMonthValue()+"&dd="
-							+time.getDayOfMonth()+"&run="
-							+time.getHour();
-		Document doc;
-		//System.out.println(urlBuilder);
-		doc = null;
 		
-		try {
-			doc = Jsoup.connect(urlBuilder).get();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}	
-		return doc.select("pre").first().text();
-	}	
 		
 	public List<String> getAreaByCode()
 	{
