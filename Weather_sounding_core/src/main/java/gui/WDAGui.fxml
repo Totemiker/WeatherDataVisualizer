@@ -26,7 +26,7 @@
                <content>
                   <SplitPane dividerPositions="0.3" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
                     <items>
-                      <AnchorPane minHeight="180.0" minWidth="0.0" prefWidth="160.0">
+                      <AnchorPane maxHeight="220.0" minHeight="180.0" minWidth="0.0" prefWidth="160.0">
                            <children>
                               <VBox prefHeight="183.0" prefWidth="400.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
@@ -87,7 +87,8 @@
                                                 <Tooltip text="Uhrzeit des Soundings auswählen" />
                                              </tooltip>
                                           </ChoiceBox>
-                                          <Button fx:id="selectButton" mnemonicParsing="false" onAction="#selectButtonAction" text="Select" />
+                                          <Button fx:id="selectButton" mnemonicParsing="false" onAction="#selectButtonAction" text="Clear &amp; Select" />
+                                          <Button fx:id="addSelectButton" mnemonicParsing="false" onAction="#addSelectButtonAction" text="Add Selected" />
                                        </children>
                                        <padding>
                                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -102,12 +103,57 @@
                         </AnchorPane>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                            <children>
-                              <TableView layoutX="95.0" layoutY="55.0" prefHeight="397.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                <columns>
-                                  <TableColumn prefWidth="75.0" text="Datum" />
-                                  <TableColumn prefWidth="75.0" text="Sounding" />
-                                </columns>
-                              </TableView>
+                              <SplitPane dividerPositions="0.5" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <items>
+                                    <AnchorPane maxWidth="500.0" minWidth="400.0">
+                                       <children>
+                                          <TableView fx:id="selectedSoundings" maxWidth="500.0" prefHeight="397.0" prefWidth="400.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <columns>
+                                              <TableColumn fx:id="columnStationID" prefWidth="75.0" text="Station ID" />
+                                              <TableColumn fx:id="columnDate" prefWidth="75.0" text="Date" />
+                                                <TableColumn fx:id="columnTime" prefWidth="75.0" text="Time" />
+                                                <TableColumn fx:id="columnLevels" prefWidth="75.0" text="Levels" />
+                                            </columns>
+                                          </TableView>
+                                       </children>
+                                    </AnchorPane>
+                                    <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                                       <children>
+                                          <VBox prefHeight="383.0" prefWidth="396.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                             <children>
+                                                <HBox prefHeight="50.0" prefWidth="200.0" spacing="10.0">
+                                                   <children>
+                                                      <Label minHeight="25.0" minWidth="75.0" prefWidth="100.0" text="Level to Plot" />
+                                                      <ChoiceBox fx:id="chooserLevelToPlot" prefWidth="150.0" />
+                                                   </children>
+                                                   <padding>
+                                                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                   </padding>
+                                                </HBox>
+                                                <HBox prefHeight="50.0" prefWidth="200.0" spacing="10.0">
+                                                   <children>
+                                                      <Label minHeight="25.0" minWidth="75.0" prefWidth="100.0" text="Value to Plot" />
+                                                      <ChoiceBox fx:id="chooserValueToPlot" prefWidth="150.0" />
+                                                   </children>
+                                                   <padding>
+                                                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                   </padding>
+                                                </HBox>
+                                                <HBox prefHeight="50.0" prefWidth="200.0" spacing="10.0">
+                                                   <children>
+                                                      <Label minHeight="25.0" minWidth="75.0" prefWidth="100.0" text="Every n-th" />
+                                                      <ChoiceBox prefWidth="150.0" />
+                                                   </children>
+                                                   <padding>
+                                                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                   </padding>
+                                                </HBox>
+                                             </children>
+                                          </VBox>
+                                       </children>
+                                    </AnchorPane>
+                                 </items>
+                              </SplitPane>
                            </children>
                         </AnchorPane>
                     </items>

@@ -50,8 +50,6 @@ public class Data_Provider implements DataProviderInterface {
 		Document doc;
 		doc = null;
 		try {
-			System.out
-					.println("getstationsbyarea: " + properties.getProperty("weblink") + "area=" + area.getAreaCode());
 			doc = Jsoup.connect(properties.getProperty("weblink") + "area=" + area.getAreaCode()).get();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -126,7 +124,8 @@ public class Data_Provider implements DataProviderInterface {
 			if (result.isValid())
 			{
 				System.out.println("Vaild Result from parser");
-				return result.getData();
+				soundingsByStation.put(station, result.getData());
+				return result.getData();				
 			}
 			else
 				{
@@ -139,8 +138,33 @@ public class Data_Provider implements DataProviderInterface {
 	}
 
 	@Override
-	public List<Sounding> getSoundingsByStation(int stationID, LocalDateTime start, LocalDateTime ende) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Sounding> getSoundingsByStation(Station station, LocalDateTime start, LocalDateTime ende, Area area) {
+		// TODO Überprüfen ob alle Soundings schon geladen sind
+		// TODO Wenn ja, einfache zurückgabe der gewünschten soundings
+		// TODO Wenn nein einlesen der Daten aus dem Web
+		
+		//Alle Soundings eines Zeitintervalls
+		/*soundingsByStation.get(station).stream()
+			.filter(arg -> arg.getDateAndTime().isAfter(start) && arg.getDateAndTime().isBefore(ende))
+			.collect(Collectors.toList());
+		*/
+		List<Sounding> temp = new ArrayList<Sounding>();
+		LocalDateTime increase = start;
+		while(increase.isBefore(ende) || increase.isEqual(ende))
+		{
+			temp.add(getSounding(station, increase, area));
+			increase = increase.plusHours(12);
+		}
+		
+		return temp;
+	}
+	
+	@Override
+	public List<Double> getMandatorySoundingLevel(Sounding sound) 
+	{
+		return sound.getLeveldata().stream()
+				.filter(arg -> arg.getLevel().equals("MAND"))
+				.map(arg -> arg.getPressure())
+				.collect(Collectors.toList());		
 	}
 }

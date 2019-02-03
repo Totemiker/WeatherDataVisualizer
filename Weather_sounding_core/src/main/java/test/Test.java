@@ -20,7 +20,7 @@ public class Test
 	
 	public static void main(String[] args)
 	{
-		Data_Provider conn = new Data_Provider();
+		//Data_Provider conn = new Data_Provider();
 		WeatherDataParser parser = new WeatherDataParser();
 		
 	
