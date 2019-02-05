@@ -1,12 +1,51 @@
 package model;
 
+/**
+ * One record / observation (at a specific station, taken at a specific pressure)
+ * Level = type of record, not pressure!
+ * @author Tobias
+ *
+ */
 public class LevelData
 {
-	private String level;
+	public static enum LevelType {
+		TRO1(-1),
+		TRO2(-1),
+		SFC(-1),
+		MAND_1000(1000),
+		MAND_925(925),
+		MAND_850(850),
+		MAND_700(700),
+		MAND_500(500),
+		MAND_400(400),
+		MAND_300(300),
+		MAND_250(250),
+		MAND_200(200),
+		MAND_150(150),
+		MAND_100(100),
+		MAND_70(70),
+		MAND_50(50),
+		MAND_30(30),
+		MAND_20(20),
+		MAND_10(10),
+		MAXW(-1),
+		CUSTOM(-1);
+		
+		private final double pressure;
+		private LevelType(double pressure) {
+			this.pressure = pressure;
+		}
+		
+		public double getPressure() {
+			return pressure;
+		}
+	};
+	
+	private LevelType level;
 	private double pressure;
 	private double temp,dewPoint,direction,windspeed,height,theta,mix;
 	
-	public LevelData(String level, double pressure, double temp, double dewPoint, double direction, double windspeed,
+	public LevelData(LevelType level, double pressure, double temp, double dewPoint, double direction, double windspeed,
 			double height, double theta, double mix) {
 		super();
 		this.level = level;
@@ -24,9 +63,9 @@ public class LevelData
 	 * 
 	 * @param split
 	 */
-	public LevelData(String[] split) {
+	public LevelData(String[] split, LevelType level) {
 		
-		level = split[0];
+		this.level = level;
 		pressure = Double.parseDouble(split[1]);
 		temp = Double.parseDouble(split[2]);
 		dewPoint = Double.parseDouble(split[3]);
@@ -42,14 +81,14 @@ public class LevelData
 	/**
 	 * @return the level
 	 */
-	public String getLevel() {
+	public LevelType getLevel() {
 		return level;
 	}
 
 	/**
 	 * @param level the level to set
 	 */
-	public void setLevel(String level) {
+	public void setLevel(LevelType level) {
 		this.level = level;
 	}
 

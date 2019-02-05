@@ -12,10 +12,12 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import model.Area;
+import model.LevelData;
 import model.Sounding;
 import model.Station;
 import model.WeatherDataParser;
 import model.WeatherDataParserValidationResult;
+import model.LevelData.LevelType;
 
 /**
  * Diese Klasse soll alle Daten zur Verfügung stellen
@@ -131,8 +133,10 @@ public class Data_Provider implements DataProviderInterface {
 				{
 				System.out.println("No Valid Result from Parser");
 				System.out.println(result.getException());
-				result.getException().printStackTrace();
-				return null;
+				//result.getException().printStackTrace();
+				result.getData().setDateAndTime(time);
+				result.getData().setStationID(station.getStationID());
+				return result.getData();
 				}
 		}
 	}
@@ -143,11 +147,6 @@ public class Data_Provider implements DataProviderInterface {
 		// TODO Wenn ja, einfache zurückgabe der gewünschten soundings
 		// TODO Wenn nein einlesen der Daten aus dem Web
 		
-		//Alle Soundings eines Zeitintervalls
-		/*soundingsByStation.get(station).stream()
-			.filter(arg -> arg.getDateAndTime().isAfter(start) && arg.getDateAndTime().isBefore(ende))
-			.collect(Collectors.toList());
-		*/
 		List<Sounding> temp = new ArrayList<Sounding>();
 		LocalDateTime increase = start;
 		while(increase.isBefore(ende) || increase.isEqual(ende))
@@ -159,12 +158,31 @@ public class Data_Provider implements DataProviderInterface {
 		return temp;
 	}
 	
-	@Override
-	public List<Double> getMandatorySoundingLevel(Sounding sound) 
+	/**
+	 * 
+	 * @return A List of available Values
+	 */
+	public List<PlotCommand> getAvailableSoundingValues()
 	{
-		return sound.getLeveldata().stream()
-				.filter(arg -> arg.getLevel().equals("MAND"))
-				.map(arg -> arg.getPressure())
-				.collect(Collectors.toList());		
+		List<PlotCommand> values = new ArrayList<PlotCommand>();
+		
+		values.add(new PlotCommand("Temperature", LevelData::getTemp));
+		values.add(new PlotCommand("Dew Point", LevelData::getDewPoint));
+		values.add(new PlotCommand("Wind Direction", LevelData::getDirection));
+		values.add(new PlotCommand("Wind Speed", LevelData::getWindspeed));
+		values.add(new PlotCommand("Height", LevelData::getHeight));
+		values.add(new PlotCommand("Theta", LevelData::getTheta));
+		values.add(new PlotCommand("Mix", LevelData::getMix));	
+		
+		return values;
+	}	
+	
+	/**
+	 * 
+	 * @return A List of available Pressure Levels to Plot
+	 */
+	public List<LevelType> getAvailablePressureLevels()
+	{
+		return List.of(LevelType.values());
 	}
 }

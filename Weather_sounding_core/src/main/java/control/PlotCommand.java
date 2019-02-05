@@ -1,20 +1,18 @@
 package control;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Function;
 
 import model.LevelData;
 
 public class PlotCommand {
 	
-	String displayName;
+	private String displayName;
 	
 	Function<LevelData, Double> extractor;
 	
 	public PlotCommand(String displayName, Function<LevelData, Double> extractor) 
 	{
-		this.displayName = displayName;
+		this.setDisplayName(displayName);
 		this.extractor = extractor;
 	}
 	
@@ -22,12 +20,13 @@ public class PlotCommand {
 	{
 		return extractor.apply(data);
 	}
-	
-	public static void main(String[] args) {
-		List<PlotCommand> commands = new ArrayList<>();
-		
-		commands.add(new PlotCommand("Temperature", LevelData::getTemp));
-		
+
+	public String getDisplayName() {
+		return displayName;
+	}
+
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
 	}
 
 }

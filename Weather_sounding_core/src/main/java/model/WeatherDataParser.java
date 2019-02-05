@@ -5,26 +5,35 @@ import java.io.StringReader;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import model.LevelData.LevelType;
+
 public class WeatherDataParser {
 
 	public static WeatherDataParserValidationResult validate(String toParse) {
 		WeatherDataParserValidationResult result = new WeatherDataParserValidationResult();
-
+		Sounding data = new Sounding();
 		try {
-			Sounding data = new Sounding();
+			
 			StringReader reader = new StringReader(toParse);
 			BufferedReader buf = new BufferedReader(reader);
 
 			List<String> tokens = buf.lines().collect(Collectors.toList());
 			
 			if (tokens.stream()
-					.anyMatch(element -> element.contains("No observations found for selection conditions"))) {
+					.anyMatch(element -> element.contains("No observations found for selection conditions"))){
+				data.setLeveldata(new ArrayList<LevelData>(List.of(createLevelData(new String[]{"", "0", "0", "0", "0", "0", "0", "0", "0" }))));
+				data.setCountry("");
+				data.setElevation(0);
+				data.setLatitude(0);
+				data.setLongitude(0);
+				data.setLevels(0);
 				throw new Exception("No observations found for selection conditions");
 			}
 									
@@ -39,13 +48,15 @@ public class WeatherDataParser {
 			List<LevelData> levelDatas;
 
 			if (tokens.size() < limit) {
+				data.setLeveldata(new ArrayList<>());
 				throw new Exception("Zu wenig Level im Datensatz");
+				
 			} else {
 				List<String> levelDataString = Stream.iterate(beginOfTable, i -> i + skip).limit(limit).map(tokens::get)
 						.map(arg -> arg.trim()).map(arg -> arg.contains("---") ? arg.replace("-----", "0") : arg)
 						.filter(arg -> arg.length() != 0).collect(Collectors.toList());
 				
-				levelDatas = levelDataString.stream().map(arg -> new LevelData(arg.split("\\s+")))
+				levelDatas = levelDataString.stream().map(arg -> createLevelData(arg.split("\\s+")))
 						.collect(Collectors.toList());
 				data.setLeveldata(levelDatas);
 			}
@@ -55,11 +66,29 @@ public class WeatherDataParser {
 			//e.printStackTrace();
 			result.setValid(false);
 			result.setException(e);
+			result.setData(data);
+			return result;
 
 		}
 		return result;
 	}
 	
+	private static LevelData createLevelData(String[] split) 
+	{
+		LevelType type = null;
+		if(split[0].equals("MAND")) {
+			split[0] = "MAND_"+((int)Double.parseDouble(split[1]));
+			type = LevelType.valueOf(split[0]);
+		}
+		else if(split[0].equals("TRO1") || split[0].equals("TRO2") || split[0].equals("SFC") || split[0].equals("MAXW"))
+			type = LevelType.valueOf(split[0]);
+		else
+			type = LevelType.CUSTOM;
+		
+		LevelData data = new LevelData(split, type); 
+		return data;
+	}
+
 	private static Sounding splitFirstHeaderLine(String line, Sounding data)
 	{		
 		Pattern linePattern = Pattern.compile("SOUNDING # [0-9]+\\s+IDN=\\s*(?<id>[0-9]+)\\s+DAY=(?<year>[0-9]{4})(?<day>[0-9]{3})\\s+TIME=\\s*(?<time>[0-9]+)\\s+VALID LEVELS=\\s*(?<lvl>[0-9]+)");
@@ -97,5 +126,7 @@ public class WeatherDataParser {
 		return data;
 		//return null;
 	}	
+	
+	
 }
 

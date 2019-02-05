@@ -7,14 +7,20 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import control.ChartGUIController;
 import control.Data_Provider;
-import control.Main_GUI_Controller;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+/**
+ * Application Window Class
+ * Generates the Main-Window via FXML-Loader
+ * @author Tobias
+ *
+ */
 public class Main_GUI extends Application {
 	
 	final Properties properties = new Properties(/*DEFAULT_PROPERTIES*/);
@@ -30,7 +36,7 @@ public class Main_GUI extends Application {
 		loadProperties();
 		
 		try {
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("WDAGui.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("ChartGUI.fxml"));
 
 			Parent root = loader.load();
 			Scene scene = new Scene(root);
@@ -43,9 +49,9 @@ public class Main_GUI extends Application {
 			
 			//Setting of props into mainguicontroller
 			
-			((Main_GUI_Controller)loader.getController()).setProperties(properties);
-			((Main_GUI_Controller)loader.getController()).setDataProvider(new Data_Provider(properties));
-			((Main_GUI_Controller)loader.getController()).setData();
+			//((ChartGUIController)loader.getController()).setProperties(properties);
+			((ChartGUIController)loader.getController()).setDataProvider(new Data_Provider(properties));
+			//((Main_GUI_Controller)loader.getController()).setData();
 			
 			primaryStage.setScene(scene);
 			primaryStage.setTitle("Weather Data Analyzer");
@@ -55,7 +61,9 @@ public class Main_GUI extends Application {
 			e.printStackTrace();
 		}
 	}
-	
+	/**
+	 * Overriden stop Method to do things in the stages of closing of Programm
+	 */
 	@Override
 	public void stop(){
 	    System.out.println("Stage is closing");

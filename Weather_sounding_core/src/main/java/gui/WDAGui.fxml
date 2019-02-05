@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.ComboBox?>
@@ -32,10 +35,7 @@
                                  <children>
                                     <HBox prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                                        <children>
-                                          <Label contentDisplay="TOP" minHeight="25.0" minWidth="75.0" text="Region">
-                                             <font>
-                                                <Font size="14.0" />
-                                             </font></Label>
+                                          <Label contentDisplay="TOP" minHeight="25.0" minWidth="75.0" text="Region" />
                                           <ComboBox fx:id="regionChooser" onAction="#chooseRegionAction" prefWidth="150.0" promptText="Choose Region" />
                                        </children>
                                        <padding>
@@ -48,11 +48,9 @@
                                              <HBox.margin>
                                                 <Insets />
                                              </HBox.margin>
-                                             <font>
-                                                <Font size="14.0" />
-                                             </font>
                                           </Label>
                                           <ComboBox fx:id="stationChooser" onAction="#stationChooserAction" prefWidth="150.0" promptText="Choose Station" />
+                                          <ChoiceBox prefWidth="150.0" />
                                        </children>
                                        <padding>
                                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -60,10 +58,7 @@
                                     </HBox>
                                     <HBox prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                                        <children>
-                                          <Label minHeight="25.0" minWidth="75.0" text="Start Date">
-                                             <font>
-                                                <Font size="14.0" />
-                                             </font></Label>
+                                          <Label minHeight="25.0" minWidth="75.0" text="Start Date" />
                                           <DatePicker fx:id="datePickerStart" />
                                           <ChoiceBox fx:id="startTimeChoiceBox" prefWidth="100.0">
                                              <tooltip>
@@ -77,10 +72,7 @@
                                     </HBox>
                                     <HBox prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                                        <children>
-                                          <Label minHeight="25.0" minWidth="75.0" text="End Date">
-                                             <font>
-                                                <Font size="14.0" />
-                                             </font></Label>
+                                          <Label minHeight="25.0" minWidth="75.0" text="End Date" />
                                           <DatePicker fx:id="datePickerEnde" />
                                           <ChoiceBox fx:id="endTimeChoiceBox" prefWidth="100.0">
                                              <tooltip>
@@ -124,7 +116,7 @@
                                                 <HBox prefHeight="50.0" prefWidth="200.0" spacing="10.0">
                                                    <children>
                                                       <Label minHeight="25.0" minWidth="75.0" prefWidth="100.0" text="Level to Plot" />
-                                                      <ChoiceBox fx:id="chooserLevelToPlot" prefWidth="150.0" />
+                                                      <ChoiceBox fx:id="levelToPlotChoiceBox" prefWidth="150.0" />
                                                    </children>
                                                    <padding>
                                                       <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -133,7 +125,8 @@
                                                 <HBox prefHeight="50.0" prefWidth="200.0" spacing="10.0">
                                                    <children>
                                                       <Label minHeight="25.0" minWidth="75.0" prefWidth="100.0" text="Value to Plot" />
-                                                      <ChoiceBox fx:id="chooserValueToPlot" prefWidth="150.0" />
+                                                      <ChoiceBox fx:id="valueToPlotChoiceBox" prefWidth="150.0" />
+                                                      <Button mnemonicParsing="false" onAction="#buttonToChartAction" text="To Chart" />
                                                    </children>
                                                    <padding>
                                                       <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -162,7 +155,26 @@
           </Tab>
             <Tab text="Data Presentation">
               <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <SplitPane dividerPositions="0.1" orientation="VERTICAL" prefHeight="571.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                          <items>
+                            <AnchorPane maxHeight="75.0" minHeight="75.0" prefHeight="100.0" prefWidth="160.0" />
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                                 <children>
+                                    <LineChart fx:id="testLineChart" prefHeight="488.0" prefWidth="798.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                      <xAxis>
+                                        <CategoryAxis label="Date" side="BOTTOM" />
+                                      </xAxis>
+                                      <yAxis>
+                                        <NumberAxis label="Selected Value" side="LEFT" />
+                                      </yAxis>
+                                    </LineChart>
+                                 </children>
+                              </AnchorPane>
+                          </items>
+                        </SplitPane>
+                     </children></AnchorPane>
               </content>
             </Tab>
             <Tab text="Options">
