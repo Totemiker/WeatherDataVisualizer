@@ -2,21 +2,21 @@ package control;
 
 import java.util.function.Function;
 
-import model.LevelData;
+import model.Reading;
 
 public class PlotCommand {
 	
 	private String displayName;
 	
-	Function<LevelData, Double> extractor;
+	Function<Reading, Double> extractor;
 	
-	public PlotCommand(String displayName, Function<LevelData, Double> extractor) 
+	public PlotCommand(String displayName, Function<Reading, Double> extractor) 
 	{
 		this.setDisplayName(displayName);
 		this.extractor = extractor;
 	}
 	
-	public double execute(LevelData data)
+	public double execute(Reading data)
 	{
 		return extractor.apply(data);
 	}

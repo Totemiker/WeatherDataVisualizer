@@ -1,22 +1,43 @@
 package model;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.StringReader;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import model.LevelData.LevelType;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
+import control.DataProvider;
+import control.WebDataProvider;
+import model.Reading.LevelType;
 
 public class WeatherDataParser {
+	
+	@FunctionalInterface
+	public static interface StationBuilder {
+		public Station buildStation(StationId stationID, String stationName, double longi,double lati, int elevation, String icao);
+	}
+	
+	StationBuilder stationSupplier = Station::new;
+	
+	public WeatherDataParser(StationBuilder builder) {
+		this.stationSupplier = builder;
+	}
 
-	public static WeatherDataParserValidationResult validate(String toParse) {
+	/**
+	 * validates a given Input String to valid Data
+	 * @param toParse	The Input Data
+	 * @return	The Result. It contains the validated Data (Sounding) and in case of no valid Data the Type of Exception and an boolean (valid)
+	 */
+	public WeatherDataParserValidationResult validate(String toParse, StationId statID) {
 		WeatherDataParserValidationResult result = new WeatherDataParserValidationResult();
 		Sounding data = new Sounding();
 		try {
@@ -28,37 +49,45 @@ public class WeatherDataParser {
 			
 			if (tokens.stream()
 					.anyMatch(element -> element.contains("No observations found for selection conditions"))){
-				data.setLeveldata(new ArrayList<LevelData>(List.of(createLevelData(new String[]{"", "0", "0", "0", "0", "0", "0", "0", "0" }))));
-				data.setCountry("");
-				data.setElevation(0);
-				data.setLatitude(0);
-				data.setLongitude(0);
-				data.setLevels(0);
 				throw new Exception("No observations found for selection conditions");
 			}
 									
 			splitFirstHeaderLine(tokens.get(2), data);
-			splitSecondHeaderLine(tokens.get(5), data);
+			data.setStation(splitSecondHeaderLine(tokens.get(5),statID));
 			
-			int beginOfTable = 11;
-			int skip = 1;
-			int size = data.getLevels();
-			int limit = size / skip + Math.min(size % skip, 1);
+			//int beginOfTable = 11;
+			//int skip = 1;
+			//int size = data.getLevels();
+			//int limit = size / skip + Math.min(size % skip, 1);
 
-			List<LevelData> levelDatas;
+			List<Reading> levelDatas;
 
-			if (tokens.size() < limit) {
-				data.setLeveldata(new ArrayList<>());
+			if (tokens.size() < 5) {
 				throw new Exception("Zu wenig Level im Datensatz");
 				
 			} else {
+				
+				String dpat = "([-+]?[0-9]*\\.?[0-9]+||-{2,})";
+				Pattern pattern = Pattern.compile("([A-Z]+[0-9]?)\\s*"+dpat+"\\s*"+dpat+"\\s*"+dpat+"\\s*"+dpat+"\\s*"+dpat+"\\s*"+dpat+"\\s*"+dpat+"\\s*"+dpat);
+				//Matcher match;
+				
+				List<String> levelDataString = tokens.stream()
+					.filter(arg -> pattern.matcher(arg).matches())    //Alle Zeilen die von der regex captured werden
+					.map(arg -> arg.trim())
+					.map(arg -> arg.contains("---") ? arg.replace("-----", "0") : arg)
+					.filter(arg -> arg.length() != 0).collect(Collectors.toList());
+				
+				levelDatas = levelDataString.stream().map(arg -> createReading(arg.split("\\s+")))
+						.collect(Collectors.toList());
+				
+				/*
 				List<String> levelDataString = Stream.iterate(beginOfTable, i -> i + skip).limit(limit).map(tokens::get)
 						.map(arg -> arg.trim()).map(arg -> arg.contains("---") ? arg.replace("-----", "0") : arg)
 						.filter(arg -> arg.length() != 0).collect(Collectors.toList());
 				
-				levelDatas = levelDataString.stream().map(arg -> createLevelData(arg.split("\\s+")))
-						.collect(Collectors.toList());
-				data.setLeveldata(levelDatas);
+				levelDatas = levelDataString.stream().map(arg -> createReading(arg.split("\\s+")))
+						.collect(Collectors.toList());*/
+				data.setReadings(levelDatas);
 			}
 			
 			result.setData(data);
@@ -73,7 +102,12 @@ public class WeatherDataParser {
 		return result;
 	}
 	
-	private static LevelData createLevelData(String[] split) 
+	/**
+	 * Creates the correct Leveltype in the Reading
+	 * @param split the Array to parse as Reading
+	 * @return the parsed Reading
+	 */
+	private static Reading createReading(String[] split) 
 	{
 		LevelType type = null;
 		if(split[0].equals("MAND")) {
@@ -85,48 +119,77 @@ public class WeatherDataParser {
 		else
 			type = LevelType.CUSTOM;
 		
-		LevelData data = new LevelData(split, type); 
+		Reading data = new Reading(split, type); 
 		return data;
 	}
-
+	
+	/**
+	 * Splits the first Stationdata line of a sounding
+	 * @param line
+	 * @param data
+	 * @return
+	 */
 	private static Sounding splitFirstHeaderLine(String line, Sounding data)
 	{		
 		Pattern linePattern = Pattern.compile("SOUNDING # [0-9]+\\s+IDN=\\s*(?<id>[0-9]+)\\s+DAY=(?<year>[0-9]{4})(?<day>[0-9]{3})\\s+TIME=\\s*(?<time>[0-9]+)\\s+VALID LEVELS=\\s*(?<lvl>[0-9]+)");
 		Matcher lineMatcher = linePattern.matcher(line);
 		if (lineMatcher.matches()) {
-			data.setStationID(Integer.parseInt(lineMatcher.group("id")));
+			//data.setStationID(Integer.parseInt(lineMatcher.group("id")));
 			data.setDateAndTime(
 					LocalDateTime.of(
 							LocalDate.ofYearDay(
 					Integer.parseInt(lineMatcher.group("year")),
 					Integer.parseInt(lineMatcher.group("day"))),
 							LocalTime.of(Integer.parseInt(lineMatcher.group("time"))/10000, 0)));
-			data.setLevels(Integer.parseInt(lineMatcher.group("lvl")));
+			//data.setLevels(Integer.parseInt(lineMatcher.group("lvl")));
 			
 		}
 		return data;
 	}
 	
-	private static Sounding splitSecondHeaderLine(String line, Sounding data)
+	private Station splitSecondHeaderLine(String line, StationId id)
 	{
+		int elevation=0;
+		double longitude=0,latitude=0;
+		String icao="",stationName = "";
 		Pattern linePattern = Pattern.compile("\\s*[0-9]+\\s*(?<icao>[A-Z]{4})?\\s*(?<station>[A-Za-z-.]*\\s?/?\\s?[A-Za-z.]*\\s?[a-zA-Z.]*)\\s*(?<state>[A-Z]{2})?\\s*(?<country>[A-Z]{2})?\\s*(?<latdeg>[0-9]{2}):(?<latmin>[0-9]{2})(?<lat>[A-Z])\\s*(?<longdeg>[0-9]{3}):(?<longMin>[0-9]{2})(?<long>[A-Z])\\s*(?<elev>[0-9]*)");
 		Matcher lineMatcher = linePattern.matcher(line);
 		if (lineMatcher.matches()) {
-			data.setElevation(Integer.parseInt(lineMatcher.group("elev")));
-			double longitude = Double.parseDouble(lineMatcher.group("longdeg"))+Double.parseDouble(lineMatcher.group("longMin"))/60;
+			elevation = Integer.parseInt(lineMatcher.group("elev"));
+			longitude = Double.parseDouble(lineMatcher.group("longdeg"))+Double.parseDouble(lineMatcher.group("longMin"))/60;
 			if(lineMatcher.group("long").equals("S"))
 				longitude = -longitude;
-			data.setLongitude(longitude);
-			double latitude = Double.parseDouble(lineMatcher.group("latdeg"))+Double.parseDouble(lineMatcher.group("latmin"))/60;
+			
+			latitude = Double.parseDouble(lineMatcher.group("latdeg"))+Double.parseDouble(lineMatcher.group("latmin"))/60;
 			if(lineMatcher.group("lat").equals("W"))
 				latitude = -latitude;
-			data.setLatitude(latitude);
+			
+			icao = lineMatcher.group("icao");
+			stationName = lineMatcher.group("station");
 			
 		}
-		return data;
+		return stationSupplier.buildStation(id, stationName, longitude, latitude, elevation, icao);
 		//return null;
 	}	
 	
+	public static void main(String[] args) {
+		
+		Document doc = null;
+		try {
+			doc = Jsoup.connect("http://meteocentre.com/radiosonde/get_sounding.php?stn=10410&type=txt&yyyy=2018&mm=10&dd=28&run=12&hist=1&show=0&lang=en&area=eur").get();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		DataProvider provider = new WebDataProvider(new Properties());
+		WeatherDataParser parser = new WeatherDataParser(provider::buildStation);
+		parser.validate(doc.select("pre").first().text(),new StationId(10410, "ALPHA", new Area("eur", "Europa")));
+		
+		//WeatherDataParser parser = new WeatherDataParser(Station::new);
+		WeatherDataParserValidationResult result = parser.validate(doc.select("pre").first().text(),new StationId(10410, "ALPHA",new Area("eur", "Europa")));
+		System.out.println(result.isValid());
+	}
 	
 }
 

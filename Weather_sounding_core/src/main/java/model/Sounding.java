@@ -1,6 +1,7 @@
 package model;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 /**
  * Klasse zum Speichern eines Soundings
@@ -9,27 +10,24 @@ import java.util.List;
  */
 public class Sounding 
 {	
-	private List<LevelData> leveldata;	
-	private LocalDateTime dateAndTime;	
-	private double longitude,latitude;	
-	private int elevation, stationID, levels;
-	private String stationCode, country;
-		
-	public Sounding(LocalDateTime dateAndTime, List<LevelData> leveldata, double longitude, double lat, int elevation,
-			int stationID, String stationCode, String country)
+	private StationId stationId;
+	private Station station;
+	private List<Reading> readings = new ArrayList<>();
+	private LocalDateTime dateAndTime;		
+	
+	
+	public Sounding(LocalDateTime dateAndTime, List<Reading> readings, Station station, StationId id)
 	{		
 		this.setDateAndTime(dateAndTime);
-		this.setLeveldata(leveldata);
-		this.longitude = longitude;
-		this.latitude = lat;
-		this.elevation = elevation;
-		this.stationCode = stationCode;
-		this.country = country;
-		this.setStationID(stationID);
+		this.setReadings(readings);		
+		this.setStation(station);
+		this.setStationId(id);
 	}
-
+	/**
+	 * Leerer Dummy Constructor
+	 */
 	public Sounding() {
-		
+		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -45,101 +43,47 @@ public class Sounding
 	public void setDateAndTime(LocalDateTime dateAndTime) {
 		this.dateAndTime = dateAndTime;
 	}
-
-	public List<LevelData> getLeveldata() {
-		return leveldata;
-	}
-
-	public void setLeveldata(List<LevelData> leveldata) {
-		this.leveldata = leveldata;
-	}
-
+	
 	/**
-	 * @return the longitude
+	 * Getter for List of available Readings
+	 * @return List of available Readings
 	 */
-	public double getLongitude() {
-		return longitude;
+	public List<Reading> getReadings() {
+		return readings;
 	}
-
 	/**
-	 * @param longitude the longitude to set
+	 * Set the available Readings
+	 * Invariant: this.readings is never NULL(!)
+	 * @param readings List of available Readings
 	 */
-	public void setLongitude(double longitude) {
-		this.longitude = longitude;
-	}
-
-	/**
-	 * @return the latitude
-	 */
-	public double getLatitude() {
-		return latitude;
-	}
-
-	/**
-	 * @param latitude the latitude to set
-	 */
-	public void setLatitude(double latitude) {
-		this.latitude = latitude;
-	}
-
-	/**
-	 * @return the elevation
-	 */
-	public int getElevation() {
-		return elevation;
-	}
-
-	/**
-	 * @param elevation the elevation to set
-	 */
-	public void setElevation(int elevation) {
-		this.elevation = elevation;
-	}
-
-	/**
-	 * @return the stationCode
-	 */
-	public String getStationCode() {
-		return stationCode;
-	}
-
-	/**
-	 * @param stationCode the stationCode to set
-	 */
-	public void setStationCode(String stationCode) {
-		this.stationCode = stationCode;
-	}
-
-	/**
-	 * @return the country
-	 */
-	public String getCountry() {
-		return country;
-	}
-
-	/**
-	 * @param country the country to set
-	 */
-	public void setCountry(String country) {
-		this.country = country;
-	}
-
-	public int getStationID() {
-		return stationID;
-	}
-
-	public void setStationID(int stationID) {
-		this.stationID = stationID;
+	public void setReadings(List<Reading> readings) {
+		if (readings == null) {
+			this.readings.clear();
+		} else this.readings = readings;
 	}
 	
-	public int getLevels() {
-		return levels;
+	/**
+	 * Getter for station
+	 * @return	The Station of the Sounding
+	 */
+	public Station getStation() {
+		return station;
+	}
+	
+	/**
+	 * Sets the station of the Sounding
+	 * @param station The station to set
+	 */
+	public void setStation(Station station) {
+		this.station = station;
 	}
 
-	public void setLevels(int levels) {
-		this.levels = levels;
+	public StationId getStationId() {
+		return stationId;
 	}
-
+	public void setStationId(StationId stationId) {
+		this.stationId = stationId;
+	}
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub

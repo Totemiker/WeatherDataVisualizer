@@ -8,7 +8,10 @@ import java.io.IOException;
 import java.util.Properties;
 
 import control.ChartGUIController;
-import control.Data_Provider;
+import control.DataProvider;
+import control.LocalHddDataProvider;
+import control.RamCacheDataProvider;
+import control.WebDataProvider;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -50,7 +53,10 @@ public class Main_GUI extends Application {
 			//Setting of props into mainguicontroller
 			
 			//((ChartGUIController)loader.getController()).setProperties(properties);
-			((ChartGUIController)loader.getController()).setDataProvider(new Data_Provider(properties));
+			
+			DataProvider provider = new RamCacheDataProvider(new LocalHddDataProvider(new WebDataProvider(properties),properties),properties);
+			
+			((ChartGUIController)loader.getController()).setDataProvider(provider);
 			//((Main_GUI_Controller)loader.getController()).setData();
 			
 			primaryStage.setScene(scene);
@@ -93,6 +99,7 @@ public class Main_GUI extends Application {
 	{
 		// set defaults
 		properties.setProperty("data_dir", (System.getProperty("user.dir")+"\\data"));
+		//System.out.println(properties.get("data_dir"));
 		properties.setProperty("weblink", "http://meteocentre.com/radiosonde/get_sounding.php?");
 		
 		// override values by loading from file

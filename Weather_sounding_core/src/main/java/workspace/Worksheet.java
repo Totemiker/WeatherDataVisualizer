@@ -8,7 +8,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.chart.XYChart.Series;
-import model.LevelData;
+import model.Reading;
 /**
  * Hält die Arbeitsdaten vor (Viewmodel) 
  * @author Tobias
@@ -17,7 +17,7 @@ import model.LevelData;
 public class Worksheet {	
 	
 	/** Geladene Rohdaten*/
-	private final ObjectProperty<ObservableList<LevelData>> selectedValues;
+	private final ObjectProperty<ObservableList<Reading>> selectedValues;
 	
 	/** Geplottete Daten*/
 	private final ObjectProperty<ObservableList<Series<String, Double>>> dataToChart;
@@ -48,20 +48,20 @@ public class Worksheet {
 		return dataToChart.get();
 	}
 	
-	public Property<ObservableList<LevelData>> selectedValuesProperty()
+	public Property<ObservableList<Reading>> selectedValuesProperty()
 	{
 		return selectedValues;
 	}
 	
-	public void setSelectedValues(List<LevelData> data)
+	public void setSelectedValues(List<Reading> data)
 	{
 		if(data instanceof ObservableList<?>)
-			selectedValues.set((ObservableList<LevelData>) data);
+			selectedValues.set((ObservableList<Reading>) data);
 		else
 			selectedValues.set(FXCollections.observableArrayList(data));
 	}
 	
-	public ObservableList<LevelData> getSelectedValues()
+	public ObservableList<Reading> getSelectedValues()
 	{
 		return selectedValues.get();
 	}

@@ -3,13 +3,12 @@ package workspace;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import control.Data_Provider;
+import control.WebDataProvider;
+import control.DataProvider;
 import control.PlotCommand;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -18,15 +17,11 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.chart.XYChart;
-import javafx.scene.chart.XYChart.Data;
-import javafx.scene.chart.XYChart.Series;
 import javafx.scene.paint.Color;
 import model.Area;
-import model.LevelData;
-import model.LevelData.LevelType;
-import model.Sounding;
-import model.Station;
+import model.Reading;
+import model.Reading.LevelType;
+import model.StationId;
 
 /**
  * Kommunikation mit Dataprovider Manipuliert das Worksheet
@@ -35,17 +30,17 @@ import model.Station;
  *
  */
 public class WorksheetController {
-	private Data_Provider provider;
+	private DataProvider provider;
 	private Worksheet sheet;
 	
 	
-	private final ObjectProperty<ObservableList<Station>> stations;
+	private final ObjectProperty<ObservableList<StationId>> stationIds;
 	private final ObjectProperty<ObservableList<Area>> areas;
 	
 	private final ObjectProperty<LocalDate> startDate, endDate;
 	
 	private final ObjectProperty<Area> selectedArea;
-	private final ObjectProperty<Station> selectedStation;	
+	private final ObjectProperty<StationId> selectedStationId;	
 	/**12=true 0=false */
 	private final BooleanProperty time;
 	
@@ -62,13 +57,13 @@ public class WorksheetController {
 	public WorksheetController(Worksheet sheet) {
 		this.sheet = sheet;
 		
-		stations			= new SimpleObjectProperty<>(this, "stations",    FXCollections.observableArrayList());
+		stationIds			= new SimpleObjectProperty<>(this, "stations",    FXCollections.observableArrayList());
 		areas				= new SimpleObjectProperty<>(this, "areas",       FXCollections.observableArrayList());
 		startDate			= new SimpleObjectProperty<>(this, "startDate",   LocalDate.now());
 		endDate				= new SimpleObjectProperty<>(this, "endDate",     LocalDate.now());
 		
 		selectedArea		= new SimpleObjectProperty<>(this, "selectedArea");
-		selectedStation		= new SimpleObjectProperty<>(this, "selectedStation");
+		selectedStationId	= new SimpleObjectProperty<>(this, "selectedStation");
 		
 		valueToPlot			= new SimpleObjectProperty<>(this, "selectedPlotCommand");
 		plottableValues		= new SimpleObjectProperty<>(this, "plotCommand", FXCollections.unmodifiableObservableList(FXCollections.observableArrayList()));
@@ -85,24 +80,24 @@ public class WorksheetController {
 	
 	
 	public void switchRegionTo(Area value) {
-		setStations(provider.getStationsByArea(value));
+		setStationIds(provider.getStationsByArea(value));
 	}
 
 	/**
 	 * @return the provider
 	 */
-	public Data_Provider getProvider() {
+	public DataProvider getProvider() {
 		return provider;
 	}
 
 	/**
 	 * @param provider the provider to set
 	 */
-	public void setProvider(Data_Provider provider) {
+	public void setProvider(DataProvider provider) {
 		this.provider = provider;
 		setAreas(provider.getAreas());
-		setPlottableValues(provider.getAvailableSoundingValues());
-		setPlottableLevels(provider.getAvailablePressureLevels());
+		setPlottableValues(getAvailableSoundingValues());
+		setPlottableLevels(getAvailablePressureLevels());
 	}
 
 	/**
@@ -120,30 +115,18 @@ public class WorksheetController {
 	}	
 	
 	/**
-	 * wird aufgerufen beim Drücken auf "Chart"
+	 * wird aufgerufen beim Drücken auf "Add Series"
 	 */
-	public void chart() // boolean replace
-	{/*
+	public void addSeries() 
+	{
+		LocalDateTime start, ende;
 		
-		Series<String, Double> series = new XYChart.Series<>();
-		series.setName(valueToPlot.get().getDisplayName());	
-		series.setData(
-		sheet.getSelectedSoundings().stream().filter(sounding -> !sounding.getLeveldata().get(0).getLevel().equals("NULL")).map(sounding -> //(sounding.getLeveldata().get(0).equals("NULL")) 
-			new Data<>(
-					sounding.getDateAndTime().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)), // date and time from sounding
-					sounding.getLeveldata()
-						.stream() // filter by selected pressure level
-						.filter(data -> levelToPlot.get() == data.getLevel()) 
-						.map(valueToPlot.get()::execute) // extract value to plot
-						.findFirst().orElseGet(() -> 0d) // only one level selected
-			))
-			  .collect(Collectors.toCollection(FXCollections::observableArrayList)));
-		//series.getChart().
-		//sheet.getSelectedSoundings().stream().filter(predicate)
-		// (if replace) then clear else no-op
-		sheet.dataToChartProperty().getValue().clear();
-		sheet.dataToChartProperty().getValue().add(series);*/
-				
+		start = LocalDateTime.of(getStartDate(), getTime() ? LocalTime.of(12, 0) : LocalTime.of(0, 0));
+		ende = LocalDateTime.of(getEndDate(), getTime() ? LocalTime.of(12, 0) : LocalTime.of(0, 0));
+		
+		System.out.println("Selected Station ID"+getSelectedStationId());
+		
+		provider.getSoundings(getSelectedStationId(), start, ende).stream().collect(Collectors.toList());
 	}
 	
 	public Property<ObservableList<LevelType>> plottableLevelsProperty()
@@ -215,21 +198,21 @@ public class WorksheetController {
 	
 
 
-	public Property<ObservableList<Station>> stationsProperty() {
-		return stations;
+	public Property<ObservableList<StationId>> stationIdsProperty() {
+		return stationIds;
 	}
 	
-	public ObservableList<Station> getStations()
+	public ObservableList<StationId> getStationIds()
 	{
-		return stations.get();
+		return stationIds.get();
 	}
 	
-	public void setStations(List<Station> st)
+	public void setStationIds(List<StationId> st)
 	{
 		if(st instanceof ObservableList<?>)
-			stations.set((ObservableList<Station>) st);
+			stationIds.set((ObservableList<StationId>) st);
 		else
-			stations.set(FXCollections.observableArrayList(st));
+			stationIds.set(FXCollections.observableArrayList(st));
 	}
 	
 	public Property<ObservableList<Area>> areaProperty()
@@ -292,8 +275,8 @@ public class WorksheetController {
 	/**
 	 * @return the selectedStationProperty
 	 */
-	public Property<Station> selectedStationProperty() {
-		return selectedStation;
+	public Property<StationId> selectedStationIdProperty() {
+		return selectedStationId;
 	}
 	
 	public Area getSelectedArea()
@@ -301,14 +284,14 @@ public class WorksheetController {
 		return selectedArea.get();
 	}
 	
-	public Station getSelectedStation()
+	public StationId getSelectedStationId()
 	{
-		return selectedStation.get();
+		return selectedStationId.get();
 	}
 	
-	public void setSelectedStation(Station station)
+	public void setSelectedStationId(StationId station)
 	{
-		selectedStation.set(station);
+		selectedStationId.set(station);
 	}
 	
 	public void setSelectedArea (Area area)
@@ -343,4 +326,54 @@ public class WorksheetController {
 	{
 		pickedColour.set(arg);
 	}
+	
+	/**
+	 * 
+	 * @return A List of available Values
+	 */
+	public List<PlotCommand> getAvailableSoundingValues()
+	{
+		List<PlotCommand> values = new ArrayList<PlotCommand>();
+		
+		values.add(new PlotCommand("Temperature", Reading::getTemp));
+		values.add(new PlotCommand("Dew Point", Reading::getDewPoint));
+		values.add(new PlotCommand("Wind Direction", Reading::getDirection));
+		values.add(new PlotCommand("Wind Speed", Reading::getWindspeed));
+		values.add(new PlotCommand("Height", Reading::getHeight));
+		values.add(new PlotCommand("Theta", Reading::getTheta));
+		values.add(new PlotCommand("Mix", Reading::getMix));	
+		
+		return values;
+	}
+	
+	
+	
+	/**
+	 * 
+	 * @return A List of available Pressure Levels to Plot
+	 */
+	public List<LevelType> getAvailablePressureLevels()
+	{
+		return List.of(LevelType.values());
+	}
 }
+
+/*
+Series<String, Double> series = new XYChart.Series<>();
+series.setName(valueToPlot.get().getDisplayName());	
+series.setData(
+sheet.getSelectedSoundings().stream().filter(sounding -> !sounding.getLeveldata().get(0).getLevel().equals("NULL")).map(sounding -> //(sounding.getLeveldata().get(0).equals("NULL")) 
+	new Data<>(
+			sounding.getDateAndTime().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)), // date and time from sounding
+			sounding.getLeveldata()
+				.stream() // filter by selected pressure level
+				.filter(data -> levelToPlot.get() == data.getLevel()) 
+				.map(valueToPlot.get()::execute) // extract value to plot
+				.findFirst().orElseGet(() -> 0d) // only one level selected
+	))
+	  .collect(Collectors.toCollection(FXCollections::observableArrayList)));
+//series.getChart().
+//sheet.getSelectedSoundings().stream().filter(predicate)
+// (if replace) then clear else no-op
+sheet.dataToChartProperty().getValue().clear();
+sheet.dataToChartProperty().getValue().add(series);*/

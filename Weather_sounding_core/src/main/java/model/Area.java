@@ -22,24 +22,47 @@ public class Area
 	}
 
 	/**
-	 * @param shortArea the shortArea to set
-	 */
-	public void setAreaCode(String shortArea) {
-		this.areaCode = shortArea;
-	}
-
-	/**
 	 * @return the longArea
 	 */
 	public String getAreaName() {
 		return areaName;
 	}
 
-	/**
-	 * @param longArea the longArea to set
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
 	 */
-	public void setAreaName(String longArea) {
-		this.areaName = longArea;
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((areaCode == null) ? 0 : areaCode.hashCode());
+		result = prime * result + ((areaName == null) ? 0 : areaName.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Area other = (Area) obj;
+		if (areaCode == null) {
+			if (other.areaCode != null)
+				return false;
+		} else if (!areaCode.equals(other.areaCode))
+			return false;
+		if (areaName == null) {
+			if (other.areaName != null)
+				return false;
+		} else if (!areaName.equals(other.areaName))
+			return false;
+		return true;
 	}
 	
 }

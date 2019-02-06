@@ -1,12 +1,13 @@
 package model;
 
 /**
- * One record / observation (at a specific station, taken at a specific pressure)
- * Level = type of record, not pressure!
+ * One record / Measurement (at a specific station, taken at a specific pressure) for multiple Parameters
+ * Parameters are Temperature, Pressure, 
+ * level = type of record, not pressure!
  * @author Tobias
  *
  */
-public class LevelData
+public class Reading
 {
 	public static enum LevelType {
 		TRO1(-1),
@@ -45,7 +46,7 @@ public class LevelData
 	private double pressure;
 	private double temp,dewPoint,direction,windspeed,height,theta,mix;
 	
-	public LevelData(LevelType level, double pressure, double temp, double dewPoint, double direction, double windspeed,
+	public Reading(LevelType level, double pressure, double temp, double dewPoint, double direction, double windspeed,
 			double height, double theta, double mix) {
 		super();
 		this.level = level;
@@ -61,9 +62,9 @@ public class LevelData
 	
 	/**
 	 * 
-	 * @param split
+	 * @param split All Measurements as Array presorted and preparsed (No invalid values)
 	 */
-	public LevelData(String[] split, LevelType level) {
+	public Reading(String[] split, LevelType level) {
 		
 		this.level = level;
 		pressure = Double.parseDouble(split[1]);
