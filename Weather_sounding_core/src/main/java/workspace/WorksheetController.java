@@ -127,6 +127,8 @@ public class WorksheetController {
 		System.out.println("Selected Station ID"+getSelectedStationId());
 		
 		provider.getSoundings(getSelectedStationId(), start, ende).stream().collect(Collectors.toList());
+		
+		System.out.println("Chart bauen");
 	}
 	
 	public Property<ObservableList<LevelType>> plottableLevelsProperty()
