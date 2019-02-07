@@ -44,6 +44,10 @@ public class Station {
 		this.setLongitude(longi);
 	}
 	
+	public Station() {
+		// TODO Auto-generated constructor stub
+	}
+	
 	/**
 	 * @return the stationName
 	 */

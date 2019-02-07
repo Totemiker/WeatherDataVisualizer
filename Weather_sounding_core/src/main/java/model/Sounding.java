@@ -11,7 +11,7 @@ import java.util.List;
 public class Sounding 
 {	
 	private StationId stationId;
-	private Station station;
+	private Station station = new Station();
 	private List<Reading> readings = new ArrayList<>();
 	private LocalDateTime dateAndTime;		
 	

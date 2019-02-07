@@ -266,7 +266,19 @@ public class ChartGUIController {
 	{
 		 //TODO Korrekter Aufbau des Charts
 		System.out.println("Add Series to active Chart");
-		controller.addSeries();
+		
+		if(tabPaneCharts.getSelectionModel().getSelectedItem() != null)
+		{
+			ChartTabController ctc;
+			System.out.println(tabPaneCharts.getSelectionModel().getSelectedItem());
+			ctc = (ChartTabController)tabPaneCharts.getSelectionModel().getSelectedItem().getUserData();
+			System.out.println();
+			
+			ctc.addSeries(controller.createSeries());
+		}
+		else
+			System.out.println("No Active Tab, therefore no chart");
+		//controller.addSeries();
 	}
 	
 	/**
@@ -290,8 +302,14 @@ public class ChartGUIController {
 		 try {
 			//FXMLLoader.load(getClass().getResource("ChartTab.fxml"));
 			Tab newTab = new Tab("Chart " + (tabPaneCharts.getTabs().size()+1));
-			newTab.setContent(FXMLLoader.load(getClass().getResource("/gui/ChartTab.fxml")));
-			tabPaneCharts.getTabs().add(newTab);			
+			
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/ChartTab.fxml"));			
+			newTab.setContent(loader.load());
+			ChartTabController ctcontrol = loader.getController();
+			System.out.println(ctcontrol);
+			newTab.setUserData(ctcontrol);
+			tabPaneCharts.getTabs().add(newTab);	
+			System.out.println(newTab);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
