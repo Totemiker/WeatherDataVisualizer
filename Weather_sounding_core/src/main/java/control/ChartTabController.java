@@ -11,7 +11,9 @@ public class ChartTabController {
 
 	public void addSeries(Series<String, Double> createSeries)
 	{
-		chartPane.getData().add(createSeries);		
+		chartPane.getData().add(createSeries);	
+		chartPane.getXAxis().autosize();
+		//chartPane.getXAxis().
 	}
 
 }

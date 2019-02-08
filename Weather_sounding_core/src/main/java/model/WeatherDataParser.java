@@ -175,7 +175,7 @@ public class WeatherDataParser {
 		try {
 			doc = Jsoup.connect("http://meteocentre.com/radiosonde/get_sounding.php?stn=10410&type=txt&yyyy=2018&mm=10&dd=28&run=12&hist=1&show=0&lang=en&area=eur").get();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 		

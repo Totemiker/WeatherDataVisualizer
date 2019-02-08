@@ -50,7 +50,7 @@ public class WebDataProvider extends ChainedDataProvider {
 		try {
 			doc = Jsoup.connect(properties.getProperty("weblink") + "area=" + area.getAreaCode()).get();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 		Elements e = doc.select("select[name=\"stn\"]").select("option");
@@ -136,7 +136,7 @@ public class WebDataProvider extends ChainedDataProvider {
 				writer.close();
 				
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 			

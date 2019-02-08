@@ -83,10 +83,10 @@ public class LocalHddDataProvider extends ChainedDataProvider{
 				}
 							
 			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}		
 			return upstream.getSounding(station, time);
@@ -100,7 +100,7 @@ public class LocalHddDataProvider extends ChainedDataProvider{
 	@Override
 	public Station buildStation(StationId stationID, String stationName, double longi, double lati, int elevation,
 			String icao) {
-		// TODO Auto-generated method stub
+		
 		Station station = new Station(stationID, stationName, longi, lati, elevation, icao);
 		return stations.stream().filter(arg -> arg.equals(station)).findFirst().orElse(station);
 		

@@ -59,6 +59,8 @@ public class WorksheetController {
 	
 	private final ObjectProperty<Color> pickedColour;
 	
+	private final ObjectProperty<ObservableList<Series<String, Double>>> chartSerien;
+	
 	//private final OB
 
 	public WorksheetController(Worksheet sheet) {
@@ -83,8 +85,11 @@ public class WorksheetController {
 		time				= new SimpleBooleanProperty (this, "time", false);
 		pickedColour		= new SimpleObjectProperty<>(this, "picked Colour");
 		
-		//provider.get
-
+		chartSerien			= new SimpleObjectProperty<>(this, "serien");
+		
+		//TODO Binding of active chart Tab to Listview on the right GUI side
+		//TODO Possibility of manipulating the Series of an active Tab
+		
 	}
 	
 	

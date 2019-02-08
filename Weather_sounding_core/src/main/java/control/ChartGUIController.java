@@ -2,16 +2,21 @@ package control;
 
 import java.io.IOException;
 
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -102,6 +107,9 @@ public class ChartGUIController {
     @FXML
     private TabPane tabPaneCharts;
     
+    @FXML
+    private ListView<Series<String,Double>> listViewSeries;
+    
 	/**
 	 * Autocalled Method - initialized by FXMLLoader
 	 */
@@ -109,6 +117,7 @@ public class ChartGUIController {
 	public void initialize()
 	{
 		//TODO Bindings CellFactorys
+		//TODO Tasks
 		
 		controller = new WorksheetController(new Worksheet());
 		
@@ -125,8 +134,7 @@ public class ChartGUIController {
 		pickerEndDate.valueProperty().bindBidirectional(controller.endDateProperty());
 		checkBoxTime.selectedProperty().bindBidirectional(controller.timeProperty());
 		colorPickerSeriesColor.valueProperty().bindBidirectional(controller.pickedColourProperty());
-		
-		
+				
 		buttonAddSeries.disableProperty().bind(Bindings.not(Bindings.createBooleanBinding(this::checkInputValidity,
 				choiceStation.getSelectionModel().selectedItemProperty(), 
 				choiceRegion.getSelectionModel().selectedItemProperty(),
@@ -136,11 +144,19 @@ public class ChartGUIController {
 				choiceValue.getSelectionModel().selectedItemProperty(),
 				colorPickerSeriesColor.valueProperty())));
 		
+		 tabPaneCharts.getTabs().add(createTab());	
+		 tabPaneCharts.requestFocus();
+		 
+		 tabPaneCharts.getSelectionModel().selectedItemProperty().addListener((ov, oldTab, newTab) -> System.out.println("changed"));
+		
+		// listViewSeries.itemsProperty().bind(null);
+		 
+		 //TODO css für GUI
+		 
 		initializeDataPresentation();
 		
 	}
-	
-		
+			
 	/**
 	 * Initialises all GUI-Elements with the appropriate data Factorys
 	 */
@@ -270,15 +286,13 @@ public class ChartGUIController {
 		if(tabPaneCharts.getSelectionModel().getSelectedItem() != null)
 		{
 			ChartTabController ctc;
-			System.out.println(tabPaneCharts.getSelectionModel().getSelectedItem());
-			ctc = (ChartTabController)tabPaneCharts.getSelectionModel().getSelectedItem().getUserData();
-			System.out.println();
-			
+			ctc = (ChartTabController)tabPaneCharts.getSelectionModel().getSelectedItem().getUserData();			
 			ctc.addSeries(controller.createSeries());
+			//listViewSeries.itemsProperty().bind(null);
 		}
 		else
 			System.out.println("No Active Tab, therefore no chart");
-		//controller.addSeries();
+		
 	}
 	
 	/**
@@ -299,22 +313,27 @@ public class ChartGUIController {
 	protected void menuActionNewChart(ActionEvent event) 
 	{
 		 System.out.println("New Chart");
-		 try {
-			//FXMLLoader.load(getClass().getResource("ChartTab.fxml"));
-			Tab newTab = new Tab("Chart " + (tabPaneCharts.getTabs().size()+1));
-			
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/ChartTab.fxml"));			
+		 tabPaneCharts.getTabs().add(createTab());
+		 
+	}
+	/**
+	 * Creates a new Tab from FXML and sets controller
+	 * @return
+	 */
+	private Tab createTab() {
+		try {
+			Tab newTab = new Tab("Chart " + (tabPaneCharts.getTabs().size() + 1));
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/ChartTab.fxml"));
 			newTab.setContent(loader.load());
 			ChartTabController ctcontrol = loader.getController();
-			System.out.println(ctcontrol);
 			newTab.setUserData(ctcontrol);
-			tabPaneCharts.getTabs().add(newTab);	
-			System.out.println(newTab);
+
+			return newTab;
+
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return null;
 		}
-		 
 	}
 	
 	/**
