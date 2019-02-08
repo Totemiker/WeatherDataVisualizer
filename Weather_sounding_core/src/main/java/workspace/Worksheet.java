@@ -17,19 +17,20 @@ import model.Reading;
 public class Worksheet {	
 	
 	/** Geladene Rohdaten*/
-	private final ObjectProperty<ObservableList<Reading>> selectedValues;
+	@Deprecated
+	//private final ObjectProperty<ObservableList<Reading>> selectedValues;
 	
 	/** Geplottete Daten*/
-	private final ObjectProperty<ObservableList<Series<String, Double>>> dataToChart;
+	//private final ObjectProperty<ObservableList<Series<String, Double>>> dataToChart;
 	
 	
 	
 	public Worksheet() {
 		
-		dataToChart		 = new SimpleObjectProperty<>(this, "chartedData", FXCollections.observableArrayList());
-		selectedValues	 = new SimpleObjectProperty<>(this, "selectedLevelData", FXCollections.observableArrayList());		
+		//dataToChart		 = new SimpleObjectProperty<>(this, "chartedData", FXCollections.observableArrayList());
+		//selectedValues	 = new SimpleObjectProperty<>(this, "selectedLevelData", FXCollections.observableArrayList());		
 	}
-	
+	/*
 	public Property<ObservableList<Series<String,Double>>> dataToChartProperty()
 	{
 		return dataToChart;
@@ -47,12 +48,12 @@ public class Worksheet {
 	{
 		return dataToChart.get();
 	}
-	
+	@Deprecated
 	public Property<ObservableList<Reading>> selectedValuesProperty()
 	{
 		return selectedValues;
 	}
-	
+	@Deprecated
 	public void setSelectedValues(List<Reading> data)
 	{
 		if(data instanceof ObservableList<?>)
@@ -60,11 +61,11 @@ public class Worksheet {
 		else
 			selectedValues.set(FXCollections.observableArrayList(data));
 	}
-	
+	@Deprecated
 	public ObservableList<Reading> getSelectedValues()
 	{
 		return selectedValues.get();
-	}
+	}*/
 	
 	
 }

@@ -49,26 +49,26 @@ public class WeatherDataParser {
 			
 			if (tokens.stream()
 					.anyMatch(element -> element.contains("No observations found for selection conditions"))){
+				data.setStationId(statID);
+				data.setStation(stationSupplier.buildStation(statID, "", 0, 0, 0, ""));
 				throw new Exception("No observations found for selection conditions");
 			}
 									
 			splitFirstHeaderLine(tokens.get(2), data);
 			data.setStation(splitSecondHeaderLine(tokens.get(5),statID));
+			data.setStationId(statID);
 			
-			//int beginOfTable = 11;
-			//int skip = 1;
-			//int size = data.getLevels();
-			//int limit = size / skip + Math.min(size % skip, 1);
-
 			List<Reading> levelDatas;
 
 			if (tokens.size() < 5) {
+				data.setStationId(statID);
+				data.setStation(stationSupplier.buildStation(statID, "", 0, 0, 0, ""));
 				throw new Exception("Zu wenig Level im Datensatz");
 				
 			} else {
 				
 				String dpat = "([-+]?[0-9]*\\.?[0-9]+||-{2,})";
-				Pattern pattern = Pattern.compile("([A-Z]+[0-9]?)\\s*"+dpat+"\\s*"+dpat+"\\s*"+dpat+"\\s*"+dpat+"\\s*"+dpat+"\\s*"+dpat+"\\s*"+dpat+"\\s*"+dpat);
+				Pattern pattern = Pattern.compile("\\s*([A-Z]+[0-9]?)\\s*"+dpat+"\\s*"+dpat+"\\s*"+dpat+"\\s*"+dpat+"\\s*"+dpat+"\\s*"+dpat+"\\s*"+dpat+"\\s*"+dpat);
 				//Matcher match;
 				
 				List<String> levelDataString = tokens.stream()
@@ -134,15 +134,12 @@ public class WeatherDataParser {
 		Pattern linePattern = Pattern.compile("SOUNDING # [0-9]+\\s+IDN=\\s*(?<id>[0-9]+)\\s+DAY=(?<year>[0-9]{4})(?<day>[0-9]{3})\\s+TIME=\\s*(?<time>[0-9]+)\\s+VALID LEVELS=\\s*(?<lvl>[0-9]+)");
 		Matcher lineMatcher = linePattern.matcher(line);
 		if (lineMatcher.matches()) {
-			//data.setStationID(Integer.parseInt(lineMatcher.group("id")));
 			data.setDateAndTime(
 					LocalDateTime.of(
 							LocalDate.ofYearDay(
 					Integer.parseInt(lineMatcher.group("year")),
 					Integer.parseInt(lineMatcher.group("day"))),
 							LocalTime.of(Integer.parseInt(lineMatcher.group("time"))/10000, 0)));
-			//data.setLevels(Integer.parseInt(lineMatcher.group("lvl")));
-			
 		}
 		return data;
 	}
@@ -178,7 +175,7 @@ public class WeatherDataParser {
 		try {
 			doc = Jsoup.connect("http://meteocentre.com/radiosonde/get_sounding.php?stn=10410&type=txt&yyyy=2018&mm=10&dd=28&run=12&hist=1&show=0&lang=en&area=eur").get();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 		

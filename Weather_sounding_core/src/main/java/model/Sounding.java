@@ -11,7 +11,7 @@ import java.util.List;
 public class Sounding 
 {	
 	private StationId stationId;
-	private Station station;
+	private Station station = new Station();
 	private List<Reading> readings = new ArrayList<>();
 	private LocalDateTime dateAndTime;		
 	
@@ -27,7 +27,7 @@ public class Sounding
 	 * Leerer Dummy Constructor
 	 */
 	public Sounding() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	/**
@@ -86,7 +86,7 @@ public class Sounding
 	}
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
+		
 		return super.toString();
 	}
 }

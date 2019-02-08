@@ -26,13 +26,8 @@ import javafx.stage.Stage;
  */
 public class Main_GUI extends Application {
 	
-	final Properties properties = new Properties(/*DEFAULT_PROPERTIES*/);
-	/*public static final Properties DEFAULT_PROPERTIES = new Properties(); 
-	
-	static {
-		DEFAULT_PROPERTIES.setProperty("beispiel", "wert");
-	}*/
-	
+	final Properties properties = new Properties();
+		
 	@Override
 	public void start(Stage primaryStage) 
 	{
@@ -44,10 +39,7 @@ public class Main_GUI extends Application {
 			Parent root = loader.load();
 			Scene scene = new Scene(root);
 			//scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-
-			// System.out.println("MAIN: "+scene.getStylesheets());
-			// primaryStage.setMaximized(true);
-			
+					
 			System.out.println("Properties: "+properties);
 			
 			//Setting of props into mainguicontroller
@@ -82,10 +74,10 @@ public class Main_GUI extends Application {
 			out = new FileOutputStream(new File(System.getProperty("user.dir")+"\\ini.properties"));
 			properties.store(out, "Properties from WDA");
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+	
 			e.printStackTrace();
 		}
 	    

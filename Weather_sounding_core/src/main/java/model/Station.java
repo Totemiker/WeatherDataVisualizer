@@ -44,6 +44,10 @@ public class Station {
 		this.setLongitude(longi);
 	}
 	
+	public Station() {
+		
+	}
+	
 	/**
 	 * @return the stationName
 	 */

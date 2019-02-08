@@ -1,11 +1,16 @@
 package workspace;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import control.WebDataProvider;
 import control.DataProvider;
@@ -17,6 +22,8 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.chart.XYChart;
+import javafx.scene.chart.XYChart.Series;
 import javafx.scene.paint.Color;
 import model.Area;
 import model.Reading;
@@ -52,6 +59,8 @@ public class WorksheetController {
 	
 	private final ObjectProperty<Color> pickedColour;
 	
+	private final ObjectProperty<ObservableList<Series<String, Double>>> chartSerien;
+	
 	//private final OB
 
 	public WorksheetController(Worksheet sheet) {
@@ -66,16 +75,21 @@ public class WorksheetController {
 		selectedStationId	= new SimpleObjectProperty<>(this, "selectedStation");
 		
 		valueToPlot			= new SimpleObjectProperty<>(this, "selectedPlotCommand");
+		//OBSOLET
 		plottableValues		= new SimpleObjectProperty<>(this, "plotCommand", FXCollections.unmodifiableObservableList(FXCollections.observableArrayList()));
 		
 		levelToPlot			= new SimpleObjectProperty<>(this, "selectedLevel");
+		//OBSOLET
 		plottableLevels		= new SimpleObjectProperty<>(this, "levelsSelection",	FXCollections.observableArrayList());
 		
 		time				= new SimpleBooleanProperty (this, "time", false);
 		pickedColour		= new SimpleObjectProperty<>(this, "picked Colour");
 		
-		//provider.get
-
+		chartSerien			= new SimpleObjectProperty<>(this, "serien");
+		
+		//TODO Binding of active chart Tab to Listview on the right GUI side
+		//TODO Possibility of manipulating the Series of an active Tab
+		
 	}
 	
 	
@@ -117,16 +131,25 @@ public class WorksheetController {
 	/**
 	 * wird aufgerufen beim Drücken auf "Add Series"
 	 */
-	public void addSeries() 
-	{
-		LocalDateTime start, ende;
-		
-		start = LocalDateTime.of(getStartDate(), getTime() ? LocalTime.of(12, 0) : LocalTime.of(0, 0));
-		ende = LocalDateTime.of(getEndDate(), getTime() ? LocalTime.of(12, 0) : LocalTime.of(0, 0));
-		
+	public Series<String,Double> createSeries() 
+	{		
 		System.out.println("Selected Station ID"+getSelectedStationId());
 		
-		provider.getSoundings(getSelectedStationId(), start, ende).stream().collect(Collectors.toList());
+		Series<String, Double> series = new Series<>();
+		
+		series.setName(""+getSelectedStationId().getStationName());
+		
+		series.setData(getStartDate().datesUntil(getEndDate().plusDays(1))
+			.map(date -> 
+				new XYChart.Data<String,Double>(date.toString(),getValueToPlot().execute(provider.getReading(getSelectedStationId()
+						, LocalDateTime.of(date, getTime() ? LocalTime.of(12, 0) : LocalTime.of(0, 0)), getLevelToPlot())
+						/*.orElse(provider.getReading(getSelectedStationId(), LocalDateTime.of(date.minusDays(1), getTime() ? LocalTime.of(12, 0) : LocalTime.of(0, 0)), getLevelToPlot())*/
+						.orElse(getDummy(LevelType.CUSTOM)))))
+			.collect(Collectors.toCollection(FXCollections::observableArrayList)));																														//CUSTOM LEVEL
+		
+		return series;
+		
+		//sheet.setDataToChart(series);
 	}
 	
 	public Property<ObservableList<LevelType>> plottableLevelsProperty()
@@ -346,8 +369,6 @@ public class WorksheetController {
 		return values;
 	}
 	
-	
-	
 	/**
 	 * 
 	 * @return A List of available Pressure Levels to Plot
@@ -356,6 +377,14 @@ public class WorksheetController {
 	{
 		return List.of(LevelType.values());
 	}
+	
+
+	
+	private Reading getDummy(LevelType type)
+	{
+		return new Reading(type, 0, 0, 0, 0, 0, 0, 0, 0);
+	}
+
 }
 
 /*

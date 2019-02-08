@@ -45,12 +45,12 @@ public class LocalHddDataProvider extends ChainedDataProvider{
 
 	@Override
 	public Sounding getSounding(StationId station, LocalDateTime time) {
-		//Load Sounding with parser from HDD or push it one up to webprovider and save that result here to file
-		System.out.println("Im HDD Provider hier muss was passieren");
+		//Load Sounding with parser from HDD or push it one up to webprovider
+		//System.out.println("Im HDD Provider hier muss was passieren");
 		String datadir = ""+properties.get("data_dir");
-		System.out.println("DataDir = "+datadir);
+		//System.out.println("DataDir = "+datadir);
 		
-		System.out.println("Station ="+station);
+		//System.out.println("Station ="+station);
 		
 		Path regionP = Path.of(datadir)
 				.resolve(""+station.getArea().getAreaCode())
@@ -65,8 +65,8 @@ public class LocalHddDataProvider extends ChainedDataProvider{
 	                   new BufferedReader(new FileReader(regionP.toFile(),Charset.forName("UTF-8")))){
 				
 				List<String> tokens = br.lines().collect(Collectors.toList());
-				System.out.println("Tokens aus dem reader in hdd read");
-				tokens.forEach(System.out::println);
+				//System.out.println("Tokens aus dem reader in hdd read");
+				//tokens.forEach(System.out::println);
 				WeatherDataParserValidationResult result = parser.validate(tokens.stream().collect(Collectors.joining("\r\n")), station);
 				
 				if (result.isValid()) {
@@ -83,10 +83,10 @@ public class LocalHddDataProvider extends ChainedDataProvider{
 				}
 							
 			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}		
 			return upstream.getSounding(station, time);
@@ -100,8 +100,10 @@ public class LocalHddDataProvider extends ChainedDataProvider{
 	@Override
 	public Station buildStation(StationId stationID, String stationName, double longi, double lati, int elevation,
 			String icao) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		Station station = new Station(stationID, stationName, longi, lati, elevation, icao);
+		return stations.stream().filter(arg -> arg.equals(station)).findFirst().orElse(station);
+		
 	}
 
 }

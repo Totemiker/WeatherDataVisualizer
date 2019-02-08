@@ -50,7 +50,7 @@ public class WebDataProvider extends ChainedDataProvider {
 		try {
 			doc = Jsoup.connect(properties.getProperty("weblink") + "area=" + area.getAreaCode()).get();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 		Elements e = doc.select("select[name=\"stn\"]").select("option");
@@ -80,15 +80,30 @@ public class WebDataProvider extends ChainedDataProvider {
 
 		System.out.println("Get Sounding from net");
 
-		String urlBuilder = "http://meteocentre.com/radiosonde/get_sounding.php?lang=en&show=0&hist=0&area="
+		/*String urlBuilder = "http://meteocentre.com/radiosonde/get_sounding.php?lang=en&show=0&hist=0&area="
 				+ station.getArea().getAreaCode() + "&stn=" + station.getStationID() + "&type=txt&yyyy="
 				+ time.getYear() + "&mm=" + time.getMonthValue() + "&dd=" + time.getDayOfMonth() + "&run="
-				+ time.getHour();
+				+ time.getHour();*/
 
 		Document doc = null;
+		
+		//System.out.println("Station ID"+station.getStationID());
 
 		try {
-			doc = Jsoup.connect(urlBuilder).get();
+			doc = Jsoup.connect( "http://meteocentre.com/radiosonde/get_sounding.php")
+				.data("lang", "en")
+				.data("type", "txt")
+				.data("area", station.getArea().getAreaCode())
+				.data("stn", ""+String.format("%05d",station.getStationID()))
+				.data("yyyy", ""+time.getYear())
+				.data("mm", ""+time.getMonthValue())
+				.data("dd", ""+time.getDayOfMonth())
+				.data("run", (time.getHour() == 0 ? "00": ""+time.getHour()))
+				.get();
+			
+			//System.out.println("Document pre"+doc.select("pre").first().text());
+			
+			//doc = Jsoup.connect(urlBuilder).get();
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
@@ -121,7 +136,7 @@ public class WebDataProvider extends ChainedDataProvider {
 				writer.close();
 				
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 			
