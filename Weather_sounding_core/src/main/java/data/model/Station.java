@@ -1,4 +1,4 @@
-package model;
+package data.model;
 
 /**
  * Stationsklasse für die Speicherung der Stationsdaten

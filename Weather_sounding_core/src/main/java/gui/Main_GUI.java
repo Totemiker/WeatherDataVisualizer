@@ -7,11 +7,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import control.ChartGUIController;
-import control.DataProvider;
-import control.LocalHddDataProvider;
-import control.RamCacheDataProvider;
-import control.WebDataProvider;
+import data.provider.DataProvider;
+import data.provider.LocalHddDataProvider;
+import data.provider.RamCacheDataProvider;
+import data.provider.UnwrapDataProvider;
+import data.provider.WebDataProvider;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -34,6 +34,7 @@ public class Main_GUI extends Application {
 		loadProperties();
 		
 		try {
+			System.out.println(getClass().getResource("ChartGUI.fxml"));
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("ChartGUI.fxml"));
 
 			Parent root = loader.load();
@@ -46,7 +47,7 @@ public class Main_GUI extends Application {
 			
 			//((ChartGUIController)loader.getController()).setProperties(properties);
 			
-			DataProvider provider = new RamCacheDataProvider(new LocalHddDataProvider(new WebDataProvider(properties),properties),properties);
+			DataProvider provider = new UnwrapDataProvider(new RamCacheDataProvider(new LocalHddDataProvider(new WebDataProvider(properties),properties),properties));
 			
 			((ChartGUIController)loader.getController()).setDataProvider(provider);
 			//((Main_GUI_Controller)loader.getController()).setData();
@@ -65,14 +66,14 @@ public class Main_GUI extends Application {
 	@Override
 	public void stop(){
 	    System.out.println("Stage is closing");
-	    FileOutputStream out;
-		
+	    		
 	    //Path path = Paths.get(System.getProperty("user.dir")+"\\ini.properties");
 		//File file = Files.crea
 	    
-	    try {			
-			out = new FileOutputStream(new File(System.getProperty("user.dir")+"\\ini.properties"));
+	    try(FileOutputStream out = new FileOutputStream(new File(System.getProperty("user.dir")+"\\ini.properties"))) {			
+			
 			properties.store(out, "Properties from WDA");
+			
 		} catch (FileNotFoundException e) {
 			
 			e.printStackTrace();
@@ -80,6 +81,8 @@ public class Main_GUI extends Application {
 	
 			e.printStackTrace();
 		}
+	    
+	    System.exit(0);
 	    
 	    // Save file
 	}

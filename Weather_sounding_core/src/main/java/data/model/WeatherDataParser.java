@@ -1,4 +1,4 @@
-package model;
+package data.model;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import control.DataProvider;
-import control.WebDataProvider;
-import model.Reading.LevelType;
+import data.model.Reading.LevelType;
+import data.provider.DataProvider;
+import data.provider.WebDataProvider;
 
 public class WeatherDataParser {
 	
@@ -69,8 +69,7 @@ public class WeatherDataParser {
 				
 				String dpat = "([-+]?[0-9]*\\.?[0-9]+||-{2,})";
 				Pattern pattern = Pattern.compile("\\s*([A-Z]+[0-9]?)\\s*"+dpat+"\\s*"+dpat+"\\s*"+dpat+"\\s*"+dpat+"\\s*"+dpat+"\\s*"+dpat+"\\s*"+dpat+"\\s*"+dpat);
-				//Matcher match;
-				
+								
 				List<String> levelDataString = tokens.stream()
 					.filter(arg -> pattern.matcher(arg).matches())    //Alle Zeilen die von der regex captured werden
 					.map(arg -> arg.trim())
@@ -79,14 +78,7 @@ public class WeatherDataParser {
 				
 				levelDatas = levelDataString.stream().map(arg -> createReading(arg.split("\\s+")))
 						.collect(Collectors.toList());
-				
-				/*
-				List<String> levelDataString = Stream.iterate(beginOfTable, i -> i + skip).limit(limit).map(tokens::get)
-						.map(arg -> arg.trim()).map(arg -> arg.contains("---") ? arg.replace("-----", "0") : arg)
-						.filter(arg -> arg.length() != 0).collect(Collectors.toList());
-				
-				levelDatas = levelDataString.stream().map(arg -> createReading(arg.split("\\s+")))
-						.collect(Collectors.toList());*/
+			
 				data.setReadings(levelDatas);
 			}
 			
@@ -168,25 +160,6 @@ public class WeatherDataParser {
 		return stationSupplier.buildStation(id, stationName, longitude, latitude, elevation, icao);
 		//return null;
 	}	
-	
-	public static void main(String[] args) {
-		
-		Document doc = null;
-		try {
-			doc = Jsoup.connect("http://meteocentre.com/radiosonde/get_sounding.php?stn=10410&type=txt&yyyy=2018&mm=10&dd=28&run=12&hist=1&show=0&lang=en&area=eur").get();
-		} catch (IOException e) {
-			
-			e.printStackTrace();
-		}
-		
-		DataProvider provider = new WebDataProvider(new Properties());
-		WeatherDataParser parser = new WeatherDataParser(provider::buildStation);
-		parser.validate(doc.select("pre").first().text(),new StationId(10410, "ALPHA", new Area("eur", "Europa")));
-		
-		//WeatherDataParser parser = new WeatherDataParser(Station::new);
-		WeatherDataParserValidationResult result = parser.validate(doc.select("pre").first().text(),new StationId(10410, "ALPHA",new Area("eur", "Europa")));
-		System.out.println(result.isValid());
-	}
 	
 }
 

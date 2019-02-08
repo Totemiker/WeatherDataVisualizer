@@ -1,4 +1,4 @@
-package control;
+package data.provider;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -14,12 +14,12 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
-import model.Area;
-import model.Sounding;
-import model.Station;
-import model.StationId;
-import model.WeatherDataParser;
-import model.WeatherDataParserValidationResult;
+import data.model.Area;
+import data.model.Sounding;
+import data.model.Station;
+import data.model.StationId;
+import data.model.WeatherDataParser;
+import data.model.WeatherDataParserValidationResult;
 
 /**
  * Diese Klasse soll alle Daten aus dem Web ziehen und zur Verfügung stellen
@@ -70,25 +70,9 @@ public class WebDataProvider extends ChainedDataProvider {
 	@Override
 	public Sounding getSounding(StationId station, LocalDateTime time) {
 		
-		/*
-		 * if (soundingsByStation.get(station).stream() .anyMatch(sound ->
-		 * sound.getDateAndTime().isEqual(time))) {
-		 * System.out.println("Found Sounding in Multimap"); return
-		 * soundingsByStation.get(station).stream() .filter(sound ->
-		 * sound.getDateAndTime().isEqual(time)) .findFirst() .get(); } else
-		 */
-
 		System.out.println("Get Sounding from net");
-
-		/*String urlBuilder = "http://meteocentre.com/radiosonde/get_sounding.php?lang=en&show=0&hist=0&area="
-				+ station.getArea().getAreaCode() + "&stn=" + station.getStationID() + "&type=txt&yyyy="
-				+ time.getYear() + "&mm=" + time.getMonthValue() + "&dd=" + time.getDayOfMonth() + "&run="
-				+ time.getHour();*/
-
 		Document doc = null;
 		
-		//System.out.println("Station ID"+station.getStationID());
-
 		try {
 			doc = Jsoup.connect( "http://meteocentre.com/radiosonde/get_sounding.php")
 				.data("lang", "en")
@@ -99,11 +83,8 @@ public class WebDataProvider extends ChainedDataProvider {
 				.data("mm", ""+time.getMonthValue())
 				.data("dd", ""+time.getDayOfMonth())
 				.data("run", (time.getHour() == 0 ? "00": ""+time.getHour()))
-				.get();
+				.get();			
 			
-			//System.out.println("Document pre"+doc.select("pre").first().text());
-			
-			//doc = Jsoup.connect(urlBuilder).get();
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
@@ -144,8 +125,8 @@ public class WebDataProvider extends ChainedDataProvider {
 		} else {
 			System.out.println("No Valid Result from Parser");
 			System.out.println(result.getException());
-			// result.getException().printStackTrace();
-			result.getData().setDateAndTime(time);
+			
+			result.getData().setDateAndTime(time);			
 			return result.getData();
 		}
 

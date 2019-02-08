@@ -1,15 +1,15 @@
-package control;
+package data.provider;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import model.Area;
-import model.Reading;
-import model.Reading.LevelType;
-import model.Sounding;
-import model.StationId;
-import model.WeatherDataParser.StationBuilder;
+import data.model.Area;
+import data.model.Reading;
+import data.model.Sounding;
+import data.model.StationId;
+import data.model.Reading.LevelType;
+import data.model.WeatherDataParser.StationBuilder;
 
 public interface DataProvider extends StationBuilder 
 {

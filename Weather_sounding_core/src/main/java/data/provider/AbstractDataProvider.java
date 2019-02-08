@@ -1,4 +1,4 @@
-package control;
+package data.provider;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -8,12 +8,12 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 
-import model.Area;
-import model.Reading;
-import model.Reading.LevelType;
-import model.Sounding;
-import model.Station;
-import model.StationId;
+import data.model.Area;
+import data.model.Reading;
+import data.model.Sounding;
+import data.model.Station;
+import data.model.StationId;
+import data.model.Reading.LevelType;
 
 public abstract class AbstractDataProvider implements DataProvider {
 	

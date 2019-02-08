@@ -1,4 +1,4 @@
-package control;
+package data.provider;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -10,13 +10,13 @@ import java.util.WeakHashMap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
-import model.Area;
-import model.Reading;
-import model.Reading.LevelType;
-import model.ReadingKey;
-import model.Sounding;
-import model.Station;
-import model.StationId;
+import data.model.Area;
+import data.model.Reading;
+import data.model.ReadingKey;
+import data.model.Sounding;
+import data.model.Station;
+import data.model.StationId;
+import data.model.Reading.LevelType;
 
 public class RamCacheDataProvider extends ChainedDataProvider {
 	
@@ -67,40 +67,16 @@ public class RamCacheDataProvider extends ChainedDataProvider {
 		ReadingKey key = new ReadingKey(station, time, type);
 		if(storedReadings.containsKey(key))
 		{
-			System.out.println("Contains Reading in RAMCache");
 			return Optional.of(storedReadings.get(key));
-		}else
+		}
+		else
 		{
-			System.out.println("Reading in Sounding and storing and returning Reading");
-			Optional<Reading> opt = getSounding(station,time).getReadings().stream().filter(arg -> arg.getLevel().equals(type)).findFirst();
-			
+			Optional<Reading> opt = upstream.getReading(station, time, type);
 			if(opt.isPresent())
 				storedReadings.put(key, opt.get());
-			else
-			{
-				int zähler = 1;
-				if (zähler <=10)
-				{
-					opt = getSounding(station,time.minusDays(zähler)).getReadings().stream().filter(arg -> arg.getLevel().equals(type)).findFirst();
-					if(opt.isPresent())
-						storedReadings.put(key, opt.get());
-					zähler++;
-					System.out.println("Versuche altes Reading zu besorgen");
-				}
-				else
-				{
-					System.out.println("Hier noch was überlegen");
-				}
-				//other Reading
-			}
-			
-			
 			return opt;
 		}
 		
-		// if sounding is cached
-			// return reading from sounding
-		// else load sound, but do not cache, and return reading
-		//return null;
 	}
+	
 }

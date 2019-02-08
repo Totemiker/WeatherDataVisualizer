@@ -1,4 +1,4 @@
-package control;
+package data.provider;
 
 public abstract class ChainedDataProvider extends AbstractDataProvider {
 	

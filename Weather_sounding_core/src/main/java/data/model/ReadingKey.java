@@ -1,8 +1,8 @@
-package model;
+package data.model;
 
 import java.time.LocalDateTime;
 
-import model.Reading.LevelType;
+import data.model.Reading.LevelType;
 
 /**
  * Constructs a Key to a Reading stored in the Cache

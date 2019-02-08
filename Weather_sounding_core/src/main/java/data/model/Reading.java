@@ -1,4 +1,4 @@
-package model;
+package data.model;
 
 /**
  * One record / Measurement (at a specific station, taken at a specific pressure) for multiple Parameters
@@ -7,7 +7,7 @@ package model;
  * @author Tobias
  *
  */
-public class Reading
+public class Reading implements Cloneable
 {
 	public static enum LevelType {
 		TRO1(-1),
@@ -45,6 +45,10 @@ public class Reading
 	private LevelType level;
 	private double pressure;
 	private double temp,dewPoint,direction,windspeed,height,theta,mix;
+	
+	public Reading() {
+		
+	}
 	
 	public Reading(LevelType level, double pressure, double temp, double dewPoint, double direction, double windspeed,
 			double height, double theta, double mix) {
@@ -214,6 +218,14 @@ public class Reading
 		return "LevelData [level=" + level + ", pressure=" + pressure + ", temp=" + temp + ", dewPoint=" + dewPoint
 				+ ", direction=" + direction + ", windspeed=" + windspeed + ", height=" + height + ", theta=" + theta
 				+ ", mix=" + mix + "]";
+	}
+	
+	public Reading clone() {
+		try {
+			return (Reading) super.clone();
+		} catch (CloneNotSupportedException e) {
+		}
+		return new Reading();
 	}
 	
 }

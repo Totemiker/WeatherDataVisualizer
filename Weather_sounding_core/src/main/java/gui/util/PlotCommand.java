@@ -1,8 +1,8 @@
-package control;
+package gui.util;
 
 import java.util.function.Function;
 
-import model.Reading;
+import data.model.Reading;
 
 public class PlotCommand {
 	

@@ -1,4 +1,4 @@
-package control;
+package data.provider;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-import model.Area;
-import model.Sounding;
-import model.Station;
-import model.StationId;
-import model.WeatherDataParser;
-import model.WeatherDataParserValidationResult;
+import data.model.Area;
+import data.model.Sounding;
+import data.model.Station;
+import data.model.StationId;
+import data.model.WeatherDataParser;
+import data.model.WeatherDataParserValidationResult;
 
 public class LocalHddDataProvider extends ChainedDataProvider{
 
