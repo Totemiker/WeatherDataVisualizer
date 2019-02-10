@@ -193,7 +193,7 @@ public class ChartGUIController {
 	public void initialize()
 	{
 		//TODO Bindings CellFactorys
-		//TODO Tasks			
+		//TODO Listview Implementation			
 			
 		choiceStation.itemsProperty().bind(stationIdsProperty());
 		choiceRegion.itemsProperty().bind(areaProperty());
@@ -216,6 +216,7 @@ public class ChartGUIController {
 				pickerEndDate.valueProperty(),
 				choiceLevel.getSelectionModel().selectedItemProperty(),
 				choiceValue.getSelectionModel().selectedItemProperty(),
+				timeProperty(),
 				colorPickerSeriesColor.valueProperty())));
 		
 		 tabPaneCharts.getTabs().add(createTab());	
@@ -417,6 +418,7 @@ public class ChartGUIController {
 	 * Repopulates the Stationlist when Region is switched
 	 * @param event The thrown ActionEvent from the GUI
 	 */
+	@SuppressWarnings("unchecked")
 	@FXML
 	protected void choiceActionRegion(ActionEvent event)
 	{
@@ -435,6 +437,7 @@ public class ChartGUIController {
 		 
 	}
 	
+	@SuppressWarnings("unchecked")
 	@FXML
 	protected void buttonActionCancel(ActionEvent event)
 	{
@@ -483,22 +486,11 @@ public class ChartGUIController {
 			isValid &= !(pickerStartDate.getValue().isAfter(pickerEndDate.getValue()));
 			isValid &= !(pickerStartDate.getValue().isAfter(LocalDate.now()));
 			isValid &= !(pickerEndDate.getValue().isAfter(LocalDate.now()));
+			isValid &= !(
+					   pickerStartDate.getValue().isEqual(pickerEndDate.getValue()) 
+					&& getTime() 
+					&& LocalTime.now().isBefore(LocalTime.of(12,00)));
 		}
-		
-		/*if (isValid) {				
-			isValid &= !(pickerStartDate.getValue().isAfter(LocalDate.now()));
-			isValid &= !(pickerEndDate.getValue().isAfter(LocalDate.now()));
-			isValid &= !(pickerStartDate.getValue().isAfter(pickerEndDate.getValue()));			
-			//isValid &= !(datePickerStart.getValue().isAfter(datePickerEnde.getValue()));
-									
-			/*isValid &= !(datePickerStart.getValue().isEqual(datePickerEnde.getValue())&&  //true
-					(startTimeChoiceBox.getValue().isAfter(LocalTime.now()) || 			//true
-					 startTimeChoiceBox.getValue().isAfter(endTimeChoiceBox.getValue()) ||
-					 endTimeChoiceBox.getValue().isAfter(LocalTime.now()) ||
-					 	(startTimeChoiceBox.getValue().isAfter(LocalTime.now())) &&
-					 	 endTimeChoiceBox.getValue().isAfter(LocalTime.now())));
-			
-		}*/
 		return isValid;
 	}
 	

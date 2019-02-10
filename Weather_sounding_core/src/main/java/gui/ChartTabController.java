@@ -22,6 +22,7 @@ public class ChartTabController {
 	//CategoryAxis;	
 	//LocalDateTime ldt = LocalDateTime.now();
 	
+	//TODO Implementation of x-Axis Class with LocalDate
 	
 	@FXML
 	public void initialize()
