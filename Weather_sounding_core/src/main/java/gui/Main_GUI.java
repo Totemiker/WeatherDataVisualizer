@@ -1,3 +1,27 @@
+/*
+ * Copyright (c) 2019 Tobias Teumert
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer. 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package gui;
 
 import java.io.File;
@@ -10,7 +34,7 @@ import java.util.Properties;
 import data.provider.DataProvider;
 import data.provider.LocalHddDataProvider;
 import data.provider.RamCacheDataProvider;
-import data.provider.UnwrapDataProvider;
+import data.provider.FixEmptyReadingsDataProvider;
 import data.provider.WebDataProvider;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -39,7 +63,7 @@ public class Main_GUI extends Application {
 
 			Parent root = loader.load();
 			Scene scene = new Scene(root);
-			//scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 					
 			System.out.println("Properties: "+properties);
 			
@@ -47,9 +71,15 @@ public class Main_GUI extends Application {
 			
 			//((ChartGUIController)loader.getController()).setProperties(properties);
 			
-			DataProvider provider = new UnwrapDataProvider(new RamCacheDataProvider(new LocalHddDataProvider(new WebDataProvider(properties),properties),properties));
+			WebDataProvider wdp = new WebDataProvider(properties);
+			LocalHddDataProvider lhddp = new LocalHddDataProvider(wdp, properties);
+			wdp.setRawCachingStrategy(lhddp::cacheRawSounding);
+			RamCacheDataProvider ramcp = new RamCacheDataProvider(lhddp, properties);			
+			
+			DataProvider provider = new FixEmptyReadingsDataProvider(ramcp);
 			
 			((ChartGUIController)loader.getController()).setDataProvider(provider);
+			
 			//((Main_GUI_Controller)loader.getController()).setData();
 			
 			primaryStage.setScene(scene);
@@ -87,8 +117,8 @@ public class Main_GUI extends Application {
 	    // Save file
 	}
 	/**
-	 * Lädt die Properties von der Festplatte
-	 * Wenn keine vorhanden sind werden Default werte erzeugt
+	 * Loading of properties from HDD
+	 * If no properties are present they are generated
 	 */
 	private void loadProperties()
 	{

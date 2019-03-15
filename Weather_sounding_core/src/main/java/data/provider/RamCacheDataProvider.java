@@ -17,11 +17,17 @@ import data.model.Sounding;
 import data.model.Station;
 import data.model.StationId;
 import data.model.Reading.LevelType;
-
+/**
+ * Ram Cache to store data in Memory, implements a WeakHashMap to protect against memory overflow
+ * @author Tobias
+ *
+ */
 public class RamCacheDataProvider extends ChainedDataProvider {
 	
+	/**Multimap containing a mapping of Area to StationID */
 	Multimap<Area, StationId> areasToStations = HashMultimap.create();
 	
+	/**WeakHashMap to be able to discard not used Readings to not stress the Memory */
 	WeakHashMap<ReadingKey, Reading> storedReadings = new WeakHashMap<>();
 	
 	public RamCacheDataProvider(DataProvider provider, Properties prop) {
@@ -67,16 +73,17 @@ public class RamCacheDataProvider extends ChainedDataProvider {
 		ReadingKey key = new ReadingKey(station, time, type);
 		if(storedReadings.containsKey(key))
 		{
+			System.out.println("Ram contains Reading");
 			return Optional.of(storedReadings.get(key));
 		}
 		else
 		{
+			System.out.println("Ram get Upstream");
 			Optional<Reading> opt = upstream.getReading(station, time, type);
 			if(opt.isPresent())
 				storedReadings.put(key, opt.get());
 			return opt;
-		}
-		
+		}		
 	}
 	
 }

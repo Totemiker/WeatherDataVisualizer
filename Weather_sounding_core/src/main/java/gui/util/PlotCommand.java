@@ -4,6 +4,11 @@ import java.util.function.Function;
 
 import data.model.Reading;
 
+/**
+ * Functional Class to link a description of a value to the actual value
+ * @author Tobias
+ *
+ */
 public class PlotCommand {
 	
 	private String displayName;

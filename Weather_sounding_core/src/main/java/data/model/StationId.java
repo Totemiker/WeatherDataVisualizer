@@ -1,9 +1,24 @@
 package data.model;
 
+/**
+ * Data-Class<p>
+ * Connects Station ID with a Station name and the Area in which said Station geographically lies.
+ * @author Tobias
+ *
+ */
 public class StationId 
-{
+{	
+	/**
+	 * The Name of the Station, mostly village or City in which Station resides 
+	 */
 	private String stationName;
+	/**
+	 * the unique Station ID
+	 */
 	private int stationID;
+	/**
+	 * The Predefined Area in which a Station resides (Not Sure about Conventions apllied)
+	 */
 	private Area area;
 	
 	public StationId(int id, String name, Area area) {

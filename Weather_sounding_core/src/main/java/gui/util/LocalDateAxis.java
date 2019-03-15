@@ -15,12 +15,21 @@ import com.google.common.collect.Lists;
 import javafx.scene.chart.Axis;
 import javafx.util.Pair;
 
-
+/**
+ * Implementation of a LocalDateAxis instead of Number Axis
+ * @author Tobias
+ *
+ */
 public class LocalDateAxis extends Axis<LocalDate> {
 	
 	private LocalDate lowerBound, upperBound;
 	
 	//FIXME Klasse korrekt programmieren
+	
+	public LocalDateAxis() {
+		lowerBound = LocalDate.now();
+		upperBound = LocalDate.now();
+	}
 	
 	@Override
 	public double getZeroPosition() {
