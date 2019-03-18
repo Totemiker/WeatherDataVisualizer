@@ -51,7 +51,7 @@ public interface DataProvider extends StationBuilder
 		 */
 		public List<StationId> getStationsByArea(Area area);
 		
-		//TODO Optional?
+		
 		/**Getter for Sounding from a specified StationID and a specified Time
 		 * 
 		 * @param station	The stationID to get the Sounding from
@@ -60,7 +60,7 @@ public interface DataProvider extends StationBuilder
 		 */
 		public Sounding getSounding(StationId station, LocalDateTime time);
 		
-		//TODO Optional?
+		
 		/**Getter for Multiple Soundings from a specified stationID in the timeframe start - end
 		 * 
 		 * @param station	The stationID to get the Sounding from

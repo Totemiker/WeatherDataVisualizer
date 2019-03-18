@@ -34,6 +34,7 @@ import javafx.scene.chart.ValueAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Tooltip;
+import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import javafx.util.Pair;
 import javafx.util.StringConverter;
@@ -57,7 +58,7 @@ public class ChartTabController {
 			
 			@Override
 			public String toString(Number l) {
-				//long temp = l.longValue();
+				
 				LocalDate ldt = LocalDate.ofEpochDay(l.longValue());
 				return ldt.format(DateTimeFormatter.ISO_DATE); // 2019-01-01 ...
 			}
@@ -65,8 +66,7 @@ public class ChartTabController {
 			@Override
 			public Long fromString(String string) {
 				// 2019-01-01
-				System.out.println("IN FROM STRING");
-				
+				System.out.println("IN FROM STRING");				
 				return Long.parseLong(string);
 			}
 		});
@@ -83,12 +83,13 @@ public class ChartTabController {
 	 * Adding of a dataseries to the active chartpane
 	 * @param createSeries the series to be added
 	 */
-	public void addSeries(Series<Number, Double> series) {
+	public void addSeries(Series<Number, Double> series, Color colour) {
+		
 		chartPane.getData().add(series);
-
+		
 		List<Series<Number, Double>> listOfSeries = chartPane.getData();
 
-		/**
+		/*
 		 * Browsing through the Data and applying ToolTip as well as the class on hover
 		 */
 		
@@ -104,35 +105,16 @@ public class ChartTabController {
 
 			// Removing class on exit
 			d.getNode().setOnMouseExited(event -> d.getNode().getStyleClass().remove("onHover"));
-		}
-
-		// long min;
-		// long max;
+		}		
 		
-		//max = bla.stream().mapToLong(serie -> serie.getData().stream().map(data -> data.getXValue().longValue()).reduce(Math::max).orElse(0L)).reduce(Math::max).orElse(0L);
-				
-		//min = bla.stream().mapToLong(serie -> serie.getData().stream().map(data -> data.getXValue().longValue()).reduce(Math::min).orElse(0L)).reduce(Math::min).orElse(0L);
 		
-		Pair<Long,Long> minMax = getLongPairFlatmap(listOfSeries);
-		
-		//bla.stream().map(this::getLongPair).reduce((a,b) -> new Pair<>(Math.min(a.getKey(),b.getKey()), Math.max(a.getValue(), b.getValue())));
-		
+		Pair<Long,Long> minMax = getLongPairFlatmap(listOfSeries);		
 				
 		((ValueAxis<Number>) chartPane.getXAxis()).setLowerBound(minMax.getKey());
 		((ValueAxis<Number>) chartPane.getXAxis()).setUpperBound(minMax.getValue());	
 		
-	}
-			
-	/*private Pair<Long,Long> getLongPair(Series<Number,Double> serie)
-	{
-		return serie.getData().stream()
-			.map(data -> data.getXValue().longValue())
-			.reduce(
-					new Pair<Long,Long>(Long.MAX_VALUE,Long.MIN_VALUE),
-					(pair, l) -> new Pair<Long,Long>(Math.min(pair.getKey(), l), Math.max(pair.getValue(), l)),
-					(a,b) -> new Pair<>(Math.min(a.getKey(), b.getKey()), Math.max(a.getValue(), b.getValue())));		
-		
-	}*/
+	}			
+	
 	/**
 	 * Fetches every Data Pair from every Series and returns the Maximum and the Minimum value contained in serie as Pair
 	 * @param serie List of Series
@@ -140,7 +122,7 @@ public class ChartTabController {
 	 */
 	private Pair<Long,Long> getLongPairFlatmap(List<Series<Number,Double>> serie)
 	{
-		//fetches every Data Pair from every Series and returns the Maximum and the Minimum value contained in serie as Pair
+		//fetches every Data Pair from every Series and returns the Maximum and the Minimum value contained in series as Pair
 		return
 			serie.stream().flatMap(sers -> sers.getData().stream())
 			.map(data -> data.getXValue().longValue())

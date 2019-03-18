@@ -98,14 +98,13 @@ public class LocalHddDataProvider extends ChainedDataProvider{
 				WeatherDataParserValidationResult result = parser.validate(tokens.stream().collect(Collectors.joining("\r\n")), station);
 				
 				if (result.isValid()) {
-					//FIXME Rewrite to Logger
-					System.out.println("HDD - Vaild Result from parser");
+					//TODO Rewrite to Logger
+					
 					//soundingsByStation.put(station, result.getData());
 					stations.add(result.getData().getStation());
 					return result.getData();
 				} else {
-					System.out.println("HDD - No Valid Result from Parser");
-					System.out.println(result.getException());				
+								
 					result.getData().setDateAndTime(time);
 					return result.getData();
 				}
@@ -118,12 +117,12 @@ public class LocalHddDataProvider extends ChainedDataProvider{
 				e.printStackTrace();
 			}
 			// if local data is corrupted use this to get new from upstream
-			System.out.println("HDD - Upstream");
+			
 			return upstream.getSounding(station, time);
 		}
 		else // no data on HDD get from upstream
 		{
-			System.out.println("Get from web");
+			
 			return upstream.getSounding(station, time);
 			
 		}

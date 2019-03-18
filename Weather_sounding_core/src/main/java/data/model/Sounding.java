@@ -13,7 +13,6 @@ public class Sounding
 	private StationId stationId;
 	private Station station = new Station();
 	private List<Reading> readings = new ArrayList<>();
-	//TODO Hier überlegen ob ein Optional<List<Reading>> sinnvoll ist
 	private LocalDateTime dateAndTime;		
 	
 	

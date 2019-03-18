@@ -45,12 +45,9 @@ public class Station {
 	/**The ICAO Code */
 	private String icao;
 	/**The Country Code */
-	private String country;//FIXME REGEX NOCH PUTT geht noch nicht
+	private String country;//FIXME REGEX
 	
-	/*public Station()
-	{
-		
-	}*/
+	
 	/**
 	 * Constructor for Station
 	 * @param stationID 	StationID Object

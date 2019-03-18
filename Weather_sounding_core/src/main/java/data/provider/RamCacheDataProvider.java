@@ -73,12 +73,12 @@ public class RamCacheDataProvider extends ChainedDataProvider {
 		ReadingKey key = new ReadingKey(station, time, type);
 		if(storedReadings.containsKey(key))
 		{
-			System.out.println("Ram contains Reading");
+			
 			return Optional.of(storedReadings.get(key));
 		}
 		else
 		{
-			System.out.println("Ram get Upstream");
+			
 			Optional<Reading> opt = upstream.getReading(station, time, type);
 			if(opt.isPresent())
 				storedReadings.put(key, opt.get());

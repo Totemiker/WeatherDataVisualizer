@@ -195,10 +195,7 @@ public class ChartGUIController {
 			}
 		};
 	};
-
-	// private final ObjectProperty<ObservableList<Series<String, Double>>>
-	// chartSerien;
-
+	
 	public ChartGUIController() {
 		
 		
@@ -211,12 +208,12 @@ public class ChartGUIController {
 		selectedStationId = new SimpleObjectProperty<>(this, "selectedStation");
 
 		valueToPlot = new SimpleObjectProperty<>(this, "selectedPlotCommand");
-		// OBSOLET
+	
 		plottableValues = new SimpleObjectProperty<>(this, "plotCommand",
 				FXCollections.unmodifiableObservableList(FXCollections.observableArrayList()));
 
 		levelToPlot = new SimpleObjectProperty<>(this, "selectedLevel");
-		// OBSOLET
+		
 		plottableLevels = new SimpleObjectProperty<>(this, "levelsSelection", FXCollections.observableArrayList());
 
 		time = new SimpleBooleanProperty(this, "time", false);
@@ -364,6 +361,8 @@ public class ChartGUIController {
 	 */
 	@FXML
 	private void buttonActionAddSeries(ActionEvent event) {
+		
+		Color seriesColour = colorPickerSeriesColor.getValue();
 
 		System.out.println("Add Series to active Chart");
 
@@ -384,7 +383,6 @@ public class ChartGUIController {
 				updateMessage("Running...");
 				long max = getStartDate().datesUntil(getEndDate().plusDays(1)).count();
 				series.setName(getSelectedStationId().getStationName());
-
 				series.setData(getStartDate().datesUntil(getEndDate().plusDays(1))
 						.map(date -> new XYChart.Data<Number, Double>(date.toEpochDay(),
 								getValueToPlot().execute(provider.getReading(getSelectedStationId(),
@@ -392,6 +390,7 @@ public class ChartGUIController {
 										getLevelToPlot()).orElse(getDummy(LevelType.CUSTOM)))))
 						.takeWhile(data -> !isCancelled()).peek(data -> updateProgress(current.incrementAndGet(), max))
 						.collect(Collectors.toCollection(FXCollections::observableArrayList)));
+				
 				return series;
 			}
 
@@ -399,7 +398,7 @@ public class ChartGUIController {
 			protected void succeeded() {
 				super.succeeded();
 				updateMessage("Success!");
-				ctc.addSeries(series);
+				ctc.addSeries(series, seriesColour);
 			}
 
 			@Override
@@ -487,7 +486,7 @@ public class ChartGUIController {
 		isValid &= !(pickerStartDate.getValue() == null);
 		isValid &= !(pickerEndDate.getValue() == null);
 		// isValid &= !(colorPickerSeriesColor.getValue() == null);
-		// System.out.println(isValid);
+		
 
 		if (isValid) {
 			isValid &= !(pickerStartDate.getValue().isAfter(pickerEndDate.getValue()));
@@ -527,9 +526,6 @@ public class ChartGUIController {
 
 	private Reading getDummy(LevelType type) {
 		return new Reading(type, 0, 0, 0, 0, 0, 0, 0, 0);
-
-		// Wenn nur ein reading fehlt getvorheriges
-
 	}
 
 	public Property<ObservableList<LevelType>> plottableLevelsProperty() {
@@ -677,11 +673,17 @@ public class ChartGUIController {
 	public boolean getTime() {
 		return time.get();
 	}
-
+	/**
+	 * Sets the time Property true = 12, false = 0
+	 * @param 
+	 */
 	public void setTime(boolean arg) {
 		time.set(arg);
 	}
-
+	/**
+	 * Property Field pickedColour
+	 * @return The pickeColourProperty
+	 */
 	public Property<Color> pickedColourProperty() {
 		return pickedColour;
 	}

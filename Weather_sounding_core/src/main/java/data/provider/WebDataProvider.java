@@ -95,7 +95,7 @@ public class WebDataProvider extends ChainedDataProvider {
 	@Override
 	public Sounding getSounding(StationId station, LocalDateTime time) {
 		
-		System.out.println("Get Sounding from net");
+		
 		Document doc = null;
 		
 		try {
