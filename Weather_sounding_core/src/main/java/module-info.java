@@ -6,8 +6,7 @@
  *
  */
 module weather_sounding_core {
-	exports data.model;
-	exports test;
+	exports data.model;	
 	exports bin;
 	exports data.provider;
 	exports gui;
