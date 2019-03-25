@@ -3,6 +3,7 @@
 	<name>Weather_sounding_core</name>
 	<comment></comment>
 	<projects>
+		<project>WeatherSoundingVisualizer</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

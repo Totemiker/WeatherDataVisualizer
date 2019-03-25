@@ -65,11 +65,9 @@ public class Main_GUI extends Application {
 			Scene scene = new Scene(root);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 					
-			System.out.println("Properties: "+properties);
+			//System.out.println("Properties: "+properties);
 			
-			//Setting of props into mainguicontroller
-			
-			//((ChartGUIController)loader.getController()).setProperties(properties);
+			//Creation of Data Provider
 			
 			WebDataProvider wdp = new WebDataProvider(properties);
 			LocalHddDataProvider lhddp = new LocalHddDataProvider(wdp, properties);
@@ -78,9 +76,7 @@ public class Main_GUI extends Application {
 			
 			DataProvider provider = new FixEmptyReadingsDataProvider(ramcp);
 			
-			((ChartGUIController)loader.getController()).setDataProvider(provider);
-			
-			//((Main_GUI_Controller)loader.getController()).setData();
+			((ChartGUIController)loader.getController()).setDataProvider(provider);		
 			
 			primaryStage.setScene(scene);
 			primaryStage.setTitle("Weather Data Analyzer");
@@ -91,11 +87,11 @@ public class Main_GUI extends Application {
 		}
 	}
 	/**
-	 * Overriden stop Method to do things in the stages of closing of Programm
+	 * Overriden stop Method to do complete Tasks in the stages of closing of the programm
 	 */
 	@Override
 	public void stop(){
-	    System.out.println("Stage is closing");
+	    //System.out.println("Stage is closing");
 	    		
 	    //Path path = Paths.get(System.getProperty("user.dir")+"\\ini.properties");
 		//File file = Files.crea
@@ -124,7 +120,10 @@ public class Main_GUI extends Application {
 	{
 		// set defaults
 		properties.setProperty("data_dir", (System.getProperty("user.dir")+"\\data"));
-		//System.out.println(properties.get("data_dir"));
+		
+		System.out.println("User Directory "+System.getProperty("user.dir"));
+		
+		// set data source
 		properties.setProperty("weblink", "http://meteocentre.com/radiosonde/get_sounding.php?");
 		
 		// override values by loading from file

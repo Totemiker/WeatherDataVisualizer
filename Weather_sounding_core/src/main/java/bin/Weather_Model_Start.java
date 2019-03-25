@@ -35,6 +35,7 @@ public class Weather_Model_Start
 {		
 	public static void main(String[] args) 
 	{
+		System.out.println("Start");
 		Application.launch(Main_GUI.class, args);
 	}
 

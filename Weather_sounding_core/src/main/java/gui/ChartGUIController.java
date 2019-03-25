@@ -69,7 +69,9 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.paint.Color;
+import javafx.util.Duration;
 
 /**
  * Controller of Main_GUI
@@ -79,7 +81,7 @@ import javafx.scene.paint.Color;
  */
 public class ChartGUIController {
 
-	// private WorksheetController controller;
+	
 	/** The Dataprovider to get Data from*/
 	private DataProvider provider;
 
@@ -264,6 +266,49 @@ public class ChartGUIController {
 		// TODO css für GUI
 
 		initializeDataPresentation();
+		initializeTooltips();
+	}
+	
+	/**
+	 * Method to supply Tooltips to all appropriate GUI-Elements
+	 */
+	private void initializeTooltips() {		
+		
+		choiceRegion.setTooltip(new Tooltip("Choose the desired geographical area"));
+		choiceRegion.getTooltip().setShowDelay(Duration.millis(250));
+		choiceRegion.getTooltip().setHideDelay(Duration.millis(100));
+		
+		choiceStation.setTooltip(new Tooltip("Choose the desired station"));
+		choiceStation.getTooltip().setShowDelay(Duration.millis(250));
+		choiceStation.getTooltip().setHideDelay(Duration.millis(100));
+		
+		choiceValue.setTooltip(new Tooltip("Choose the displayed parameter"));
+		choiceValue.getTooltip().setShowDelay(Duration.millis(250));
+		choiceValue.getTooltip().setHideDelay(Duration.millis(100));
+		
+		choiceLevel.setTooltip(new Tooltip("Choose the desired pressure level"));
+		choiceLevel.getTooltip().setShowDelay(Duration.millis(250));
+		choiceLevel.getTooltip().setHideDelay(Duration.millis(100));
+		
+		buttonAddSeries.setTooltip(new Tooltip("Add new line to chart with given parameters"));
+		buttonAddSeries.getTooltip().setShowDelay(Duration.millis(250));
+		buttonAddSeries.getTooltip().setHideDelay(Duration.millis(100));
+		
+		checkBoxTime.setTooltip(new Tooltip("Check this, if 12:00 data should be used"));
+		checkBoxTime.getTooltip().setShowDelay(Duration.millis(250));
+		checkBoxTime.getTooltip().setHideDelay(Duration.millis(100));
+		
+		buttonCancel.setTooltip(new Tooltip("Cancel data processing"));
+		buttonCancel.getTooltip().setShowDelay(Duration.millis(250));
+		buttonCancel.getTooltip().setHideDelay(Duration.millis(100));
+		
+		pickerEndDate.setTooltip(new Tooltip("End of desired time interval"));
+		pickerEndDate.getTooltip().setShowDelay(Duration.millis(250));
+		pickerEndDate.getTooltip().setHideDelay(Duration.millis(100));
+		
+		pickerStartDate.setTooltip(new Tooltip("Start of desired time interval"));
+		pickerStartDate.getTooltip().setShowDelay(Duration.millis(250));
+		pickerStartDate.getTooltip().setHideDelay(Duration.millis(100));
 	}
 
 	/**

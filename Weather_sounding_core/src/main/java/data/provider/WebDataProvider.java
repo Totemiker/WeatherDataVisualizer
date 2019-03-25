@@ -65,14 +65,14 @@ public class WebDataProvider extends ChainedDataProvider {
 		
 	}
 	
+	/**
+	 * Method to set the desired caching strategy
+	 * @param strat
+	 */
 	public void setRawCachingStrategy(RawCachingStrategy strat)
 	{
 		this.strategy = strat;
-	}
-	
-	
-	
-	
+	}	
 	@Override
 	public List<StationId> getStationsByArea(Area area) {
 
