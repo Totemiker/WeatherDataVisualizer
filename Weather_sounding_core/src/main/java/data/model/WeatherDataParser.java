@@ -58,7 +58,7 @@ public class WeatherDataParser {
 		 * @param lati
 		 * @param elevation
 		 * @param icao
-		 * @return
+		 * @return the Station defined by the supplied Parameters
 		 */
 		public Station buildStation(StationId stationID, String stationName, double longi, double lati, int elevation,
 				String icao);
@@ -111,14 +111,14 @@ public class WeatherDataParser {
 
 			List<Reading> levelDatas;
 
-			String dpat = "([-+]?[0-9]*\\.?[0-9]+||-{2,})";
+			String dpat = "([-+]?[0-9]*\\.?[0-9]+||-{2,})"; //part of the Leveldata
 			Pattern pattern = Pattern.compile("\\s*([A-Z]+[0-9]?)\\s*" + dpat + "\\s*" + dpat + "\\s*" + dpat + "\\s*"
-					+ dpat + "\\s*" + dpat + "\\s*" + dpat + "\\s*" + dpat + "\\s*" + dpat);
+					+ dpat + "\\s*" + dpat + "\\s*" + dpat + "\\s*" + dpat + "\\s*" + dpat); //complete expression to parse one row
 
 			List<String> levelDataString = tokens.stream()
 					.filter(arg -> pattern.matcher(arg).matches()) 
 					.map(arg -> arg.trim())
-					.map(arg -> arg.contains("---") ? arg.replace("-----", "0") : arg)
+					.map(arg -> arg.contains("---") ? arg.replace("-----", "0") : arg)	//check for non existing values and put them to zero
 					.filter(arg -> arg.length() != 0).collect(Collectors.toList());
 
 			levelDatas = levelDataString.stream().map(arg -> createReading(arg.split("\\s+")))
@@ -188,6 +188,7 @@ public class WeatherDataParser {
 		int elevation = 0;
 		double longitude = 0, latitude = 0;
 		String icao = "", stationName = "";
+		//FIXME: Pattern checken
 		Pattern linePattern = Pattern.compile(
 				"\\s*[0-9]+\\s*(?<icao>[A-Z]{4})?\\s*(?<station>[A-Za-z-.]*\\s?/?\\s?[A-Za-z.]*\\s?[a-zA-Z.]*)\\s*(?<state>[A-Z]{2})?\\s*(?<country>[A-Z]{2})?\\s*(?<latdeg>[0-9]{2}):(?<latmin>[0-9]{2})(?<lat>[A-Z])\\s*(?<longdeg>[0-9]{3}):(?<longMin>[0-9]{2})(?<long>[A-Z])\\s*(?<elev>[0-9]*)");
 		Matcher lineMatcher = linePattern.matcher(line);

@@ -30,12 +30,12 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-
 import data.model.Area;
 import data.model.Reading;
 import data.model.Reading.LevelType;
@@ -57,9 +57,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -69,8 +71,10 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
 import javafx.scene.paint.Color;
+import javafx.stage.Modality;
 import javafx.util.Duration;
 
 /**
@@ -86,7 +90,8 @@ public class ChartGUIController {
 	private DataProvider provider;
 
 	@FXML
-	private MenuItem menuNewChart;
+	private MenuItem menuNewChart, menuClose;
+	
 
 	/**
 	 * Shows the available Areas to the user Holds the chosen Area
@@ -163,9 +168,11 @@ public class ChartGUIController {
 	@FXML
 	private Label labelProgress;
 
-	/** ListView of read-in Series */
+	/** ListView of displayed Series */
 	@FXML
-	private ListView<Series<String, Double>> listViewSeries;
+	private ListView<Series<Number, Double>> listViewSeries;
+	
+	private ContextMenu tabContextMenu;
 
 	private final ObjectProperty<ObservableList<StationId>> stationIds;
 	private final ObjectProperty<ObservableList<Area>> areas;
@@ -219,9 +226,7 @@ public class ChartGUIController {
 		plottableLevels = new SimpleObjectProperty<>(this, "levelsSelection", FXCollections.observableArrayList());
 
 		time = new SimpleBooleanProperty(this, "time", false);
-		pickedColour = new SimpleObjectProperty<>(this, "picked Colour");
-
-		// chartSerien = new SimpleObjectProperty<>(this, "serien");
+		pickedColour = new SimpleObjectProperty<>(this, "pickedColour");	
 
 	}
 
@@ -231,8 +236,6 @@ public class ChartGUIController {
 	@FXML
 	public void initialize() {
 		// TODO Bindings CellFactorys
-		// TODO Listview Implementation
-
 		choiceStation.itemsProperty().bind(stationIdsProperty());
 		choiceRegion.itemsProperty().bind(areaProperty());
 		choiceLevel.itemsProperty().bind(plottableLevelsProperty());
@@ -257,12 +260,13 @@ public class ChartGUIController {
 
 		tabPaneCharts.getTabs().add(createTab());
 		tabPaneCharts.requestFocus();
-
+		
+		//Adds Listener to TabPane which triggers if a tab changes
 		tabPaneCharts.getSelectionModel().selectedItemProperty()
 				.addListener((ov, oldTab, newTab) -> System.out.println("changed"));
-
-		// listViewSeries.itemsProperty().bind(null);
-
+		
+		
+		
 		// TODO css für GUI
 
 		initializeDataPresentation();
@@ -277,38 +281,47 @@ public class ChartGUIController {
 		choiceRegion.setTooltip(new Tooltip("Choose the desired geographical area"));
 		choiceRegion.getTooltip().setShowDelay(Duration.millis(250));
 		choiceRegion.getTooltip().setHideDelay(Duration.millis(100));
+		choiceRegion.getTooltip().getStyleClass().add("tooltip_Font");
 		
 		choiceStation.setTooltip(new Tooltip("Choose the desired station"));
 		choiceStation.getTooltip().setShowDelay(Duration.millis(250));
 		choiceStation.getTooltip().setHideDelay(Duration.millis(100));
+		choiceStation.getTooltip().getStyleClass().add("tooltip_Font");
 		
 		choiceValue.setTooltip(new Tooltip("Choose the displayed parameter"));
 		choiceValue.getTooltip().setShowDelay(Duration.millis(250));
 		choiceValue.getTooltip().setHideDelay(Duration.millis(100));
+		choiceValue.getTooltip().getStyleClass().add("tooltip_Font");
 		
 		choiceLevel.setTooltip(new Tooltip("Choose the desired pressure level"));
 		choiceLevel.getTooltip().setShowDelay(Duration.millis(250));
 		choiceLevel.getTooltip().setHideDelay(Duration.millis(100));
+		choiceLevel.getTooltip().getStyleClass().add("tooltip_Font");
 		
 		buttonAddSeries.setTooltip(new Tooltip("Add new line to chart with given parameters"));
 		buttonAddSeries.getTooltip().setShowDelay(Duration.millis(250));
 		buttonAddSeries.getTooltip().setHideDelay(Duration.millis(100));
+		buttonAddSeries.getTooltip().getStyleClass().add("tooltip_Font");
 		
 		checkBoxTime.setTooltip(new Tooltip("Check this, if 12:00 data should be used"));
 		checkBoxTime.getTooltip().setShowDelay(Duration.millis(250));
 		checkBoxTime.getTooltip().setHideDelay(Duration.millis(100));
+		checkBoxTime.getTooltip().getStyleClass().add("tooltip_Font");
 		
 		buttonCancel.setTooltip(new Tooltip("Cancel data processing"));
 		buttonCancel.getTooltip().setShowDelay(Duration.millis(250));
 		buttonCancel.getTooltip().setHideDelay(Duration.millis(100));
+		buttonCancel.getTooltip().getStyleClass().add("tooltip_Font");
 		
 		pickerEndDate.setTooltip(new Tooltip("End of desired time interval"));
 		pickerEndDate.getTooltip().setShowDelay(Duration.millis(250));
 		pickerEndDate.getTooltip().setHideDelay(Duration.millis(100));
+		pickerEndDate.getTooltip().getStyleClass().add("tooltip_Font");
 		
 		pickerStartDate.setTooltip(new Tooltip("Start of desired time interval"));
 		pickerStartDate.getTooltip().setShowDelay(Duration.millis(250));
 		pickerStartDate.getTooltip().setHideDelay(Duration.millis(100));
+		pickerStartDate.getTooltip().getStyleClass().add("tooltip_Font");
 	}
 
 	/**
@@ -365,7 +378,18 @@ public class ChartGUIController {
 				}
 			};
 		});
-
+		
+		listViewSeries.setCellFactory(value -> new ListCell<>() {
+			protected void updateItem(Series<Number,Double> item, boolean empty) {
+				super.updateItem(item, empty);
+				if (item == null || empty) {
+					setText(null);
+				} else {
+					setText(item.getName().replace("series", ""));
+				}
+			};
+		});
+		
 		choiceLevel.setCellFactory(value -> this.buildLevelTypeListCell());
 		choiceLevel.setButtonCell(buildLevelTypeListCell());
 		
@@ -400,6 +424,8 @@ public class ChartGUIController {
 		setPlottableLevels(getAvailablePressureLevels());
 	}
 	
+	///////////////////////    FXML INJECTED FIELDS            ///////////////////////////
+	
 	/**
 	 * Injected Method from FXML - Buttonclick "Add Series to chart"
 	 * @param event The thrown ActionEvent from the GUI
@@ -426,15 +452,21 @@ public class ChartGUIController {
 			@Override
 			protected Series<Number, Double> call() throws Exception {
 				updateMessage("Running...");
-				long max = getStartDate().datesUntil(getEndDate().plusDays(1)).count();
-				series.setName(getSelectedStationId().getStationName());
-				series.setData(getStartDate().datesUntil(getEndDate().plusDays(1))
-						.map(date -> new XYChart.Data<Number, Double>(date.toEpochDay(),
-								getValueToPlot().execute(provider.getReading(getSelectedStationId(),
-										LocalDateTime.of(date, getTime() ? LocalTime.of(12, 0) : LocalTime.of(0, 0)),
-										getLevelToPlot()).orElse(getDummy(LevelType.CUSTOM)))))
-						.takeWhile(data -> !isCancelled()).peek(data -> updateProgress(current.incrementAndGet(), max))
-						.collect(Collectors.toCollection(FXCollections::observableArrayList)));
+				
+				long max = getStartDate().datesUntil(getEndDate().plusDays(1)).count();		//Daycount
+				
+				series.setName(getSelectedStationId().getStationName());	// Name of series
+				
+				series.setData(getStartDate().datesUntil(getEndDate().plusDays(1)) //map the dates to the double values
+						.map(date -> new XYChart.Data<Number, Double>(date.toEpochDay(), getValueToPlot().execute(provider.getReading(
+									getSelectedStationId(),															//from selected station
+									LocalDateTime.of(date, getTime() ? LocalTime.of(12, 0) : LocalTime.of(0, 0)),	//at specified time
+									getLevelToPlot()).orElse(getDummy(LevelType.CUSTOM)))))							//and specified level
+						.takeWhile(data -> !isCancelled()).peek(data -> updateProgress(current.incrementAndGet(), max))		//take while not cancelled and display progress
+						.collect(Collectors.toCollection(FXCollections::observableArrayList)));		//collect to list
+				
+				String seriesName = getLevelToPlot()+ " / "+getValueToPlot().getDisplayName();				
+				series.setName(seriesName);
 				
 				return series;
 			}
@@ -443,7 +475,9 @@ public class ChartGUIController {
 			protected void succeeded() {
 				super.succeeded();
 				updateMessage("Success!");
-				ctc.addSeries(series, seriesColour);
+				ctc.addSeries(series, seriesColour, getSelectedStationId().getStationName());
+				//listViewSeries.getItems().clear();
+				listViewSeries.setItems(ctc.getActiveSeries());
 			}
 
 			@Override
@@ -478,9 +512,15 @@ public class ChartGUIController {
 	 */
 	@FXML
 	private void menuActionNewChart(ActionEvent event) {
-		System.out.println("New Chart");
+		//System.out.println("New Chart");
 		tabPaneCharts.getTabs().add(createTab());
 
+	}
+	
+	@FXML
+	private void menuActionClose(ActionEvent event)
+	{
+		System.exit(0);
 	}
 
 	/**
@@ -493,7 +533,26 @@ public class ChartGUIController {
 	private void buttonActionCancel(ActionEvent event) {
 		((Task<Series<String, Double>>) progress.getUserData()).cancel();
 	}
+	
+	/**
+	 * Creates a Custom Dialog to input a new display name for the active chart and blocks user interaction
+	 */
+	private void tabContentMenuDialog(ActionEvent ae, Tab active)
+	{
+		TextInputDialog dialog = new TextInputDialog("");			
+		dialog.setTitle("Change name of chart");
+		dialog.setHeaderText("New name has to be not empty \nand shorter then 15 chars");
+		dialog.setContentText("Please enter new display text");		
+		dialog.initModality(Modality.APPLICATION_MODAL);
 
+		dialog.getDialogPane().lookupButton(ButtonType.OK).disableProperty()
+						.bind(Bindings.or(
+								Bindings.isEmpty(dialog.getEditor().textProperty()),	//No Text Input
+								Bindings.lessThan(15, dialog.getEditor().textProperty().length())));		//Input longer then 15 chars		
+		
+		Optional<String> result = dialog.showAndWait();			
+		result.ifPresent(name -> active.setText(name));		
+	}
 	/**
 	 * Creates a new Tab from FXML and sets controller
 	 * 
@@ -506,7 +565,18 @@ public class ChartGUIController {
 			newTab.setContent(loader.load());
 			ChartTabController ctcontrol = loader.getController();
 			newTab.setUserData(ctcontrol);
+			
+			MenuItem changeName;
+			
+			changeName = new MenuItem("Change Name");
+			
+			changeName.setOnAction(event -> tabContentMenuDialog(event, newTab));			
+			
+			tabContextMenu = new ContextMenu(changeName);			
+			
+			newTab.setContextMenu(tabContextMenu);
 
+			
 			return newTab;
 
 		} catch (IOException e) {
@@ -607,7 +677,10 @@ public class ChartGUIController {
 	public void setValueToPlot(PlotCommand plc) {
 		valueToPlot.set(plc);
 	}
-
+	/**
+	 * Returns the choosen PlotCommand
+	 * @return
+	 */
 	public PlotCommand getValueToPlot() {
 		return valueToPlot.get();
 	}

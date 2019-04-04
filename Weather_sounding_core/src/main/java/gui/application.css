@@ -1,3 +1,12 @@
 .onHover{
     -fx-background-color: ORANGE;
 }
+
+.tooltip_Font{
+	-fx-font-size: 14px;
+}
+
+.axis_font{
+	-fx-font-size: 14px;
+	-fxfont-weight: bold;
+}

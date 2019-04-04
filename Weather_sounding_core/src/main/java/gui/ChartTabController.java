@@ -26,15 +26,22 @@ package gui;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.List;
-
+import java.util.Locale;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.ValueAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
 import javafx.util.Pair;
 import javafx.util.StringConverter;
@@ -53,14 +60,13 @@ public class ChartTabController {
 	@FXML
 	public void initialize()
 	{
-		//chartPane.getXAxis()
 		((ValueAxis<Number>) chartPane.getXAxis()).setTickLabelFormatter(new StringConverter<Number>() {
 			
 			@Override
 			public String toString(Number l) {
 				
 				LocalDate ldt = LocalDate.ofEpochDay(l.longValue());
-				return ldt.format(DateTimeFormatter.ISO_DATE); // 2019-01-01 ...
+				return ldt.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).localizedBy(Locale.GERMANY)); // 2019-01-01 ...
 			}
 			
 			@Override
@@ -74,6 +80,9 @@ public class ChartTabController {
 		((ValueAxis<Number>) chartPane.getXAxis()).setTickLength(1);
 		((ValueAxis<Number>) chartPane.getXAxis()).setTickLabelRotation(-75D);
 		
+		((ValueAxis<Number>) chartPane.getXAxis()).setTickLabelFont(Font.font("", FontWeight.BOLD, 13));
+		((ValueAxis<Double>) chartPane.getYAxis()).setTickLabelFont(Font.font("", FontWeight.BOLD, 13));
+		
 	//	((ValueAxis<Number>) chartPane.getXAxis()).setTickLabelFont();
 	//	((ValueAxis<Number>) chartPane.getXAxis()).setMinorTickLength(1);
 	//	((ValueAxis<Number>) chartPane.getXAxis()).setTickLabelsVisible(true);
@@ -83,23 +92,27 @@ public class ChartTabController {
 	 * Adding of a dataseries to the active chartpane
 	 * @param createSeries the series to be added
 	 */
-	public void addSeries(Series<Number, Double> series, Color colour) {
+	public void addSeries(Series<Number, Double> series, Color colour, String title) {
 		
 		chartPane.getData().add(series);
 		
 		List<Series<Number, Double>> listOfSeries = chartPane.getData();
-
 		/*
 		 * Browsing through the Data and applying ToolTip as well as the class on hover
 		 */
 		
 		for (XYChart.Data<Number, Double> d : series.getData()) 
 		{
-			Tooltip t = new Tooltip(""+d.getYValue());
+			Tooltip t = new Tooltip(LocalDate.ofEpochDay(
+					d.getXValue().longValue()).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).localizedBy(Locale.GERMANY))
+					+ "\r\n"
+					+ d.getYValue());
 			t.setHideDelay(Duration.millis(100));
-			t.setShowDelay(Duration.millis(100));
-			Tooltip.install(d.getNode(),t);
-
+			t.setShowDelay(Duration.millis(100));			
+			t.setTextAlignment(TextAlignment.CENTER);
+			t.getStyleClass().add("tooltip_Font");
+			
+			Tooltip.install(d.getNode(),t);			
 			// Adding class on hover
 			d.getNode().setOnMouseEntered(event -> d.getNode().getStyleClass().add("onHover"));
 
@@ -111,7 +124,11 @@ public class ChartTabController {
 		Pair<Long,Long> minMax = getLongPairFlatmap(listOfSeries);		
 				
 		((ValueAxis<Number>) chartPane.getXAxis()).setLowerBound(minMax.getKey());
-		((ValueAxis<Number>) chartPane.getXAxis()).setUpperBound(minMax.getValue());	
+		((ValueAxis<Number>) chartPane.getXAxis()).setUpperBound(minMax.getValue());
+		
+		//TODO Tick Label anpassen
+		
+		chartPane.setTitle(title);
 		
 	}			
 	
@@ -130,5 +147,10 @@ public class ChartTabController {
 					(pair, l) -> new Pair<Long,Long>(Math.min(pair.getKey(), l), Math.max(pair.getValue(), l)),
 					(a,b) -> new Pair<>(Math.min(a.getKey(), b.getKey()), Math.max(a.getValue(), b.getValue())));
 	}
+	
+	public ObservableList<Series<Number,Double>> getActiveSeries()
+	{
+		return chartPane.getData();
+	}	
 
 }
